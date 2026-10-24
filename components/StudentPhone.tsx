@@ -5,8 +5,9 @@ import {ConditionEditor,ConditionSummary} from './ConditionCard';
 import {Icon} from './Icon';
 const time=(value:string)=>{const [h,m]=value.split(':').map(Number);return `${h%12||12}${m?':'+String(m).padStart(2,'0'):''}${h>=12?'pm':'am'}`};
 function EventInfo({event}:{event:EventSummary}){return <div className="event-info"><strong>{event.title}</strong><span>{event.day} · {time(event.start)}–{time(event.end)} · ${event.price}</span></div>}
-export function StudentPhone({id,seedText,standalone=false}:{id:string;seedText:string;standalone?:boolean}){
- const [view,setView]=useState<StudentView|null>(null),[error,setError]=useState(''),[text,setText]=useState(''),[busy,setBusy]=useState(false),[editing,setEditing]=useState(false),[connected,setConnected]=useState(false);
+export function StudentPhone({id,seedText,standalone=false,locked=false}:{id:string;seedText:string;standalone?:boolean;locked?:boolean}){
+ const [view,setView]=useState<StudentView|null>(null),[error,setError]=useState(''),[text,setText]=useState(''),[pending,setBusy]=useState(false),[editing,setEditing]=useState(false),[connected,setConnected]=useState(false);
+ const busy=pending||locked;
  const scroll=useRef<HTMLDivElement>(null);
  useEffect(()=>{const source=new EventSource(`/api/student/${id}/stream`);source.onopen=()=>setConnected(true);source.onmessage=e=>{const next=JSON.parse(e.data);if(next.type==='snapshot')setView(next.data)};source.onerror=()=>setConnected(false);return()=>source.close()},[id]);
  useEffect(()=>{scroll.current?.scrollTo({top:scroll.current.scrollHeight,behavior:'smooth'})},[view?.messages.length,view?.proposal?.stage,view?.proposal?.version,view?.conditions,editing]);
@@ -32,7 +33,7 @@ export function StudentPhone({id,seedText,standalone=false}:{id:string;seedText:
    {p&&p.stage!=='closed'&&<button className="text-button withdraw" disabled={busy} onClick={()=>send({type:'withdraw',proposalId:p.proposalId,version:p.version})}>withdraw from this proposal</button>}
   </div>
   {error&&<div role="alert" className="error">{error}</div>}
-  <form className="composer" onSubmit={e=>{e.preventDefault();if(text.trim())void send({type:'intake',text:text.trim()})}}><input aria-label={`Message ${view.self.name}'s agent`} placeholder="what are you down for?" value={text} onChange={e=>setText(e.target.value)} maxLength={2000} disabled={busy||!canEdit}/><button type="submit" aria-label="Send message" disabled={busy||!text.trim()||!canEdit}><Icon name="arrow" size={17}/></button></form>
+  <form className="composer" onSubmit={e=>{e.preventDefault();if(text.trim())void send({type:'intake',text:text.trim()})}}><input aria-label={`Message ${view.self.name}'s agent`} placeholder="what are you down for?" value={text||view.draftText||''} onChange={e=>setText(e.target.value)} maxLength={2000} disabled={busy||!canEdit}/><button type="submit" aria-label="Send message" disabled={busy||!text.trim()||!canEdit}><Icon name="arrow" size={17}/></button></form>
   <div className="phone-footnote">just you + your agent</div>
  </article>
 }

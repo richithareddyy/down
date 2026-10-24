@@ -109,7 +109,7 @@ export type StudentProposalView =
       event: EventSummary; memberNames: string[]; ownAttendance: AttendanceDecision | 'pending' })
   | (ProposalRef & { stage: 'closed'; message: string });
 export interface StudentView {
-  self: { id: StudentId; name: string }; circleName: string;
+  self: { id: StudentId; name: string }; circleName: string; draftText?: string;
   messages: PrivateMessage[]; conditions: Conditions | null;
   discoveryApproved: boolean; discoveryExpiresAt: ISODateTime | null;
   proposal: StudentProposalView | null; recheck: RecheckPrompt | null;

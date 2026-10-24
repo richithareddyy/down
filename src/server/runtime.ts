@@ -11,6 +11,8 @@ export class Runtime {
  private stores=new Map<string,AgentStore>();
  private agents=new Map<string,StudentAgent>();
  private prompts=new Map<string,RecheckPrompt>();
+ private drafts=new Map<string,string>();
+ setDraft(id:string,text:string){this.store(id);this.drafts.set(id,text);this.notify()}
  private listeners=new Set<()=>void>();
  log:ProtocolLog;
  machine:ProposalMachine;
@@ -26,7 +28,7 @@ export class Runtime {
  private store(id:string){const store=this.stores.get(id);if(!store)throw new DomainError('NOT_FOUND','student not found');return store}
  subscribe(listener:()=>void){this.listeners.add(listener);return ()=>{this.listeners.delete(listener)}}
  notify(){for(const listener of this.listeners)listener()}
- reset(){this.generation++;this.scriptRunning=false;this.scriptStep='ready when you are';this.stores.clear();this.agents.clear();this.prompts.clear();this.log=new ProtocolLog(this.now);this.machine=new ProposalMachine(this.log.emit,this.now,ids=>ids.map(id=>students.find(s=>s.id===id)!.name));this.seedStores();this.notify()}
+ reset(){this.generation++;this.scriptRunning=false;this.scriptStep='ready when you are';this.stores.clear();this.agents.clear();this.prompts.clear();this.drafts.clear();this.log=new ProtocolLog(this.now);this.machine=new ProposalMachine(this.log.emit,this.now,ids=>ids.map(id=>students.find(s=>s.id===id)!.name));this.seedStores();this.notify()}
  private message(id:string,text:string,role:'student'|'agent'='agent'){
   const store=this.store(id),state=store.read();store.update(state.revision,{...state,messages:[...state.messages,{id:crypto.randomUUID(),role,text,createdAt:this.now().toISOString()}]});
  }
@@ -104,7 +106,7 @@ export class Runtime {
    else if(p.status==='awaiting_reveal')proposal={...ref,stage:'awaiting_reveal',event:summarize(p.eventSnapshot),groupSize:p.memberIds.length,ownDecision:p.revealApprovals[id],expiresAt:p.expiresAt};
    else proposal={...ref,stage:p.status,event:summarize(p.eventSnapshot),memberNames:students.filter(s=>p.memberIds.includes(s.id)).map(s=>s.name),ownAttendance:p.attendance[id]};
   }
-  return {self:{id:student.id,name:student.name},circleName:circle.name,messages:state.messages,conditions:state.conditions,discoveryApproved:state.discoveryApproved&&!!this.agents.get(id)!.getInterestAdvertisements(this.now().toISOString()).length,discoveryExpiresAt:state.discoveryExpiresAt,proposal,recheck:p?.status==='evaluating'?this.prompts.get(id)??null:null,revision:state.revision};
+  return {self:{id:student.id,name:student.name},circleName:circle.name,draftText:this.drafts.get(id)||'',messages:state.messages,conditions:state.conditions,discoveryApproved:state.discoveryApproved&&!!this.agents.get(id)!.getInterestAdvertisements(this.now().toISOString()).length,discoveryExpiresAt:state.discoveryExpiresAt,proposal,recheck:p?.status==='evaluating'?this.prompts.get(id)??null:null,revision:state.revision};
  }
  demoView(){return {rows:this.log.rows(),generation:this.generation,scriptRunning:this.scriptRunning,scriptStep:this.scriptStep}}
 }
