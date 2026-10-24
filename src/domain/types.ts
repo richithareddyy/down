@@ -102,6 +102,7 @@ export interface RecheckPrompt {
   text: string; proposedConditions: Conditions;
 }
 export type StudentProposalView =
+  | (ProposalRef & { stage: 'evaluating'; event: EventSummary; groupSize: number })
   | (ProposalRef & { stage: 'awaiting_reveal'; event: EventSummary; groupSize: number;
       ownDecision: RevealDecision | 'pending'; expiresAt: ISODateTime })
   | (ProposalRef & { stage: 'revealed' | 'awaiting_attendance' | 'confirmed';
