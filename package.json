@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack --hostname 0.0.0.0",
+    "dev": "node scripts/dev.mjs",
     "build": "next build --webpack",
     "start": "next start --hostname 0.0.0.0",
     "test": "vitest run",
@@ -16,10 +16,11 @@
     "zod": "^4.1.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.0",
     "@types/node": "^24.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.0",
     "vitest": "^4.0.0"
   },
   "type": "module"
