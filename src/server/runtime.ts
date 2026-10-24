@@ -1,3 +1,4 @@
+import { RequestLanguage } from '../agents/language';
 import { students, events, circle } from '../demo/seed';
 import type { AgentStore, Conditions, IntakeResult, RecheckPrompt, StudentCommand, StudentView, StudentProposalView } from '../domain/types';
 import { createAgentStore } from './store';
@@ -16,7 +17,7 @@ export class Runtime {
  generation=0;
  scriptRunning=false;
  scriptStep='ready when you are';
- constructor(private now:()=>Date=()=>new Date(),private parser:Parser=async()=>({kind:'clarify',question:'choose an activity and review your conditions below.'})){
+ constructor(private now:()=>Date=()=>new Date(),private parser:Parser=(text,own)=>new RequestLanguage().parse(text,own)){
   this.log=new ProtocolLog(now);
   this.machine=new ProposalMachine(this.log.emit,now,ids=>ids.map(id=>students.find(s=>s.id===id)!.name));
   this.seedStores();
@@ -64,7 +65,11 @@ export class Runtime {
    const parsed=await this.parser(command.text,before.conditions);
    if(generation!==this.generation)throw new DomainError('STALE_VERSION','the demo was reset');
    if(this.store(id).read().revision!==before.revision)throw new DomainError('STALE_VERSION','your request changed while it was being interpreted');
-   if(parsed.kind==='parsed'){this.setConditions(id,parsed.conditions);this.message(id,'here’s what i heard. edit anything, then approve discovery.')}else this.message(id,parsed.question);
+   if(parsed.kind==='parsed'){
+    const reply=await new RequestLanguage().phrase({conditions:parsed.conditions,intent:'review'});
+    if(generation!==this.generation||this.store(id).read().revision!==before.revision)throw new DomainError('STALE_VERSION','your request changed while it was being interpreted');
+    this.setConditions(id,parsed.conditions);this.message(id,reply);
+   }else this.message(id,parsed.question);
   }else if(command.type==='edit_conditions'){
    if(p&&p.status!=='closed'&&p.memberIds.includes(id))throw new DomainError('NOT_ALLOWED','withdraw before changing conditions for an active proposal');
    this.setConditions(id,command.conditions);
