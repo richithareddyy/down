@@ -18,6 +18,7 @@ const STATUS = /^(status|where are we|what'?s up|any updates?|what'?s open)\b/i;
 const NEVER_MIND = /^(never ?mind|forget it|scratch that|cancel|stop looking)\b/i;
 const DEMO = /^demo\b/i;
 const CLOSE = /^(close|done|we'?re (full|done)|cancel)\b/i;
+const DROP = /^(i )?(can'?t make it|cant make it|can'?t go|not coming|drop out|something came up)\b/i;
 
 const LEVEL: Record<string, string> = { new: "beginner", casual: "casual", competitive: "competitive" };
 const versionLine = (v: Version) => `**${v.label}** from ${clock(v.start)} to ${clock(v.end)}`;
@@ -57,12 +58,27 @@ export function noteFor(v: SeatView): string | null {
         return `✳ **${v.newcomers} newcomer${v.newcomers === 1 ? "" : "s"} can fill your seats**\nswitch from ${v.group.now} to ${versionLine(v.version!)}?${r ? `\none of them leaves at ${clock(r.at)}, and your sub already agreed to rotate in.` : ""}\nyou learn who they are when everyone confirms, never why. reply **yes** or **pass**.`;
       return `✳ **a seat is open for you**\n${v.group.title} at ${v.group.place}: ${versionLine(v.version!)}.\n${v.newcomers ? `you won't be the only new one: ${v.newcomers} other newcomer${v.newcomers === 1 ? "" : "s"} join${v.newcomers === 1 ? "s" : ""} with you.` : "you're the newcomer they need."}${r ? (r.you ? `\nyou can leave at ${clock(r.at)}: someone rotates in for you.` : `\none newcomer leaves at ${clock(r.at)} and a sub rotates in.`) : ""}\nnames unlock when everyone confirms. reply **yes** to take your seat, or **pass**.`;
     case "seated":
-      return `✳ **you're in**\n${v.group.place} · ${versionLine(v.version!)}\nwith: ${v.names!.join(", ")}.${r ? `\nrotation at ${clock(r.at)}.` : ""}`;
+      return `✳ **you're in**\n${v.group.place} · ${versionLine(v.version!)}\nwith: ${v.names!.join(", ")}.${r ? `\nrotation at ${clock(r.at)}.` : ""}${v.role === "seeker" ? "\nsomething came up? say **can't make it** and your seat goes to someone else." : ""}`;
     case "closed":
       return v.role === "captain" ? "**no arrangement for your open seats right now.** i'll keep looking while your post is up." : null;
     default:
       return null;
   }
+}
+
+const ADD_LINK = "https://discord.com/oauth2/authorize?client_id=1563729007642677338&scope=bot&permissions=68608";
+export const NO_SERVER = `we don't share a server yet, so there are no open seats i can see for you.\n• add me to your club, dorm or friend group's server: ${ADD_LINK}\n• or join ours: https://discord.gg/f36rKZA5z\nyour terms stay saved; i'll look as soon as we share a server.`;
+
+/** Model reads per person per minute, so a flood of DMs can't burn through the model. */
+const readsByHub = new WeakMap<Hub, Map<string, number[]>>();
+function allowRead(hub: Hub, id: string, nowMs = Date.now()) {
+  if (!readsByHub.has(hub)) readsByHub.set(hub, new Map());
+  const reads = readsByHub.get(hub)!;
+  const recent = (reads.get(id) ?? []).filter((t) => nowMs - t < 60_000);
+  if (recent.length >= 6) return false;
+  recent.push(nowMs);
+  reads.set(id, recent);
+  return true;
 }
 
 export interface DmContext {
@@ -85,6 +101,7 @@ function statusText(hub: Hub, ctx: DmContext): string {
   const t = hub.terms(ctx.userId);
   if (t && !t.approved) return `**kept between us (not locked in yet)**\n${describeTerms(t.input)}\n\nreply **yes** to lock it in.`;
   if (t) return `**quietly looking**\n${describeTerms(t.input)}\n\nyou won't get counteroffers or failed searches. only a complete seat.`;
+  if (!ctx.guilds.length) return NO_SERVER;
   const open = hub.openIn(ctx.guilds);
   return open.length
     ? `**open seats in your servers:**\n${open.map((r) => `• ${r.group.title} at ${r.group.place} (${r.group.now} now)`).join("\n")}\nwant in? tell me privately what you'd join and on what terms.`
@@ -138,6 +155,17 @@ export async function handleDM(hub: Hub, ctx: DmContext, raw: string): Promise<s
       return ["a complete arrangement is waiting on you. reply **yes** or **pass**."];
     }
 
+    const seated = hub.views(id).find(({ view }) => view.stage === "seated");
+    if (seated && DROP.test(text)) {
+      hub.act(seated.record.group.id, (b) => b.dropOut(id));
+      return ["**got it, your seat is released.** the agents are re-arranging for the others. nobody is told why."];
+    }
+    const captainOf = hub.views(id).find(({ view }) => view.role === "captain");
+    if (captainOf && CLOSE.test(text)) {
+      hub.removeGroup(captainOf.record.group.id);
+      return [`**closed** ${captainOf.record.group.title} at ${captainOf.record.group.place}. thanks for opening seats.`];
+    }
+
     const t = hub.terms(id);
     if (t && NEVER_MIND.test(text)) {
       hub.withdrawSeeker(id);
@@ -155,10 +183,14 @@ export async function handleDM(hub: Hub, ctx: DmContext, raw: string): Promise<s
     if (hub.views(id).some(({ view }) => view.role === "captain" || view.role === "sub" || view.stage === "seated")) return [statusText(hub, ctx)];
 
     const open = hub.openIn(ctx.guilds).map((r) => `${r.group.title} at ${r.group.place}`).join("; ") || "none yet";
+    if (!allowRead(hub, id)) return ["give me a minute to catch up, then send that again."];
     const read = await ctx.parse(text, open, ctx.now);
     if (read.kind === "clarify") return [read.question];
+    const { freeFrom, freeUntil } = read.terms;
+    if (freeUntil <= ctx.now) return [`${clock(freeUntil)} has already passed today. when are you free, from now on?`];
+    if (freeUntil <= freeFrom) return ["i can only plan within today for now. when are you free, and when do you have to leave?"];
     hub.draftSeeker(id, read.terms, ctx.guilds);
-    return [`**kept between us.**\n${describeTerms(read.terms)}\n\nnone of this leaves me. reply **yes** to lock it in, or tell me what to change.`];
+    return [`**kept between us.**\n${describeTerms(read.terms)}\n\nnone of this leaves me. reply **yes** to lock it in, or tell me what to change.${ctx.guilds.length ? "" : `\n\n${NO_SERVER}`}`];
   } catch (error) {
     if (error instanceof Error && /^(nothing to|you're already)/.test(error.message)) return [error.message + "."];
     throw error;

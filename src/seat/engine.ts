@@ -62,6 +62,9 @@ export interface ProtocolRow {
   ok: boolean;
 }
 
+/** How many fitting students a search considers per version. */
+export const MAX_CANDIDATES = 12;
+
 export type Fit = { ok: true; leavesEarly: boolean } | { ok: false; why: "kind" | "level" | "late" | "window" };
 
 /** One seeker's agent, judging one version privately. Only ok / not-ok leaves it. */
@@ -108,10 +111,9 @@ export function arrange(g: OpenGroup, seekers: SeekerTerms[], s: SearchState = {
     if (s.versionsPassed?.has(v.id)) continue;
     const need = v.size - g.playing;
     if (need < 1) continue;
-    const ok = pool.filter((t) => {
-      const f = fits(t, g, v);
-      return f.ok;
-    });
+    // A big server can have hundreds of students looking. Agents consider the earliest-asking
+    // dozen who fit, which keeps the search instant and is fair (first come, first seated).
+    const ok = pool.filter((t) => fits(t, g, v).ok).slice(0, MAX_CANDIDATES);
     const found = combos(ok, need)
       .map((c) => {
         const early = c.filter((t) => (fits(t, g, v) as { ok: true; leavesEarly: boolean }).leavesEarly);

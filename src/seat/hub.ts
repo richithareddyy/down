@@ -3,6 +3,7 @@
 // student is held by at most one arrangement at a time. State is in memory for this prototype.
 import { SeatBoard, type SeatView, type SeekerInput } from "./board";
 import type { OpenGroup } from "./engine";
+import { addMinutes } from "../agents/language";
 
 export interface GroupRecord {
   group: OpenGroup;
@@ -65,9 +66,31 @@ export class Hub {
     this.settle();
   }
 
-  /** Groups whose game is over are dropped. */
-  sweep(nowHHMM: string) {
-    for (const [id, r] of this.groups) if (r.group.versions.every((v) => v.end <= nowHHMM) && r.board.stage !== "seated") this.groups.delete(id);
+  /**
+   * Keep the world current: games that are over are dropped, a version whose start has passed
+   * becomes "starting in 5 minutes", and unanswered asks expire (silence counts as no).
+   */
+  sweep(nowHHMM: string, nowMs = this.now().getTime(), ttlMs = 10 * 60_000) {
+    let moved = false;
+    for (const [id, r] of this.groups) {
+      if (r.group.versions.every((v) => v.end <= nowHHMM)) {
+        this.groups.delete(id);
+        moved = true;
+        continue;
+      }
+      if (r.board.stage === "idle" || r.board.stage === "closed") {
+        const soon = addMinutes(nowHHMM, 5);
+        const versions = r.group.versions
+          .map((v) => (v.start < soon ? { ...v, start: soon } : v))
+          .filter((v, i, all) => v.start < v.end && all.findIndex((w) => w.start === v.start && w.label === v.label) === i);
+        if (versions.length !== r.group.versions.length || versions.some((v, i) => v.start !== r.group.versions[i].start)) {
+          r.group.versions = versions;
+          r.board.group = r.group;
+        }
+      }
+      moved = r.board.expire(nowMs, ttlMs) || moved;
+    }
+    if (moved) this.settle();
   }
 
   draftSeeker(id: string, input: SeekerInput, guilds: string[]) {

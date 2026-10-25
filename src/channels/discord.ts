@@ -1,7 +1,7 @@
 // Open Seat on Discord. Add the bot to any server. Groups mention it in a channel to post open
 // seats; anyone DMs it their terms, privately. Each person's DM thread is their own agent.
 // Runs inside the Next.js server process (see instrumentation.ts).
-import { ChannelType, Client, Events, GatewayIntentBits, Partials, type Message, type TextChannel } from "discord.js";
+import { ChannelType, Client, Events, GatewayIntentBits, PermissionFlagsBits, Partials, type Guild, type Message, type TextChannel } from "discord.js";
 import { RequestLanguage } from "../agents/language";
 import { isDemo } from "../seat/demo";
 import { Hub } from "../seat/hub";
@@ -26,10 +26,42 @@ export const getHub = () => (store.openSeatHub ??= new Hub());
 
 const language = () => new RequestLanguage();
 
+const told = new Set<string>();
+
+/** DM someone. If their DMs are closed, say so once in a channel where they're part of a group. */
 async function send(bridge: Bridge, userId: string, lines: string[]) {
   if (!lines.length || isDemo(userId)) return;
-  const user = await bridge.client.users.fetch(userId);
-  for (const line of lines) await user.send(line);
+  try {
+    const user = await bridge.client.users.fetch(userId);
+    for (const line of lines) await user.send(line);
+  } catch (error) {
+    console.error("[open-seat/discord] couldn't DM", userId, (error as Error).message);
+    if (told.has(userId)) return;
+    const where = bridge.hub.views(userId)[0]?.record.channelId;
+    const channel = where ? await bridge.client.channels.fetch(where).catch(() => null) : null;
+    if (channel && channel.type === ChannelType.GuildText) {
+      told.add(userId);
+      await (channel as TextChannel).send(`<@${userId}> i couldn't DM you. turn on DMs from server members (server menu → privacy settings) so your agent can reach you.`).catch(() => {});
+    }
+  }
+}
+
+const WELCOME = [
+  "✳ **open seat is here.** it helps people join groups that are already happening, without the awkward ask.",
+  "**got open seats?** mention me in any channel:",
+  "> @Open Seat 6 of us at court 2 playing 3v3 till 2:30, 4v4 if 2 more join. @friend can sub",
+  "**want in on something?** DM me your terms, privately:",
+  "> basketball, beginner, free till 2:30, not if i'm the only new one",
+  "i only read messages that mention me, and DMs. trying it alone? type **@Open Seat demo**.",
+].join("\n");
+
+/** When added to a server, say hello where people can see it. */
+async function welcome(guild: Guild) {
+  const me = guild.members.me;
+  const channels = [guild.systemChannel, ...(await guild.channels.fetch()).values()].filter(
+    (c): c is TextChannel => !!c && c.type === ChannelType.GuildText && !!me && c.permissionsFor(me).has(PermissionFlagsBits.SendMessages),
+  );
+  await channels[0]?.send(WELCOME).catch(() => {});
 }
 
 /** Serialize work per person so two quick messages never race each other. */
@@ -150,6 +182,10 @@ export function startDiscord() {
     if (pending) return;
     pending = setTimeout(() => { pending = null; notifyAll(bridge); }, 150);
   });
+
+  client.on(Events.GuildCreate, (guild) => void welcome(guild));
+  // Every minute: drop finished games, refresh start times, expire unanswered asks.
+  setInterval(() => bridge.hub.sweep(campusNow()), 60_000).unref?.();
 
   client.on(Events.MessageCreate, (msg) => {
     if (msg.author.bot) return;

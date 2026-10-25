@@ -36,6 +36,8 @@ export class SeatBoard {
   readonly auto = new Set<string>();
   log: ProtocolRow[] = [];
   version = 0;
+  /** When the current ask went out, so silence can expire. */
+  private askedAt = 0;
 
   constructor(
     public group: OpenGroup,
@@ -126,6 +128,7 @@ export class SeatBoard {
       this.stage = tried ? "closed" : "idle";
       return;
     }
+    this.askedAt = this.now().getTime();
     if (this.bundle.rotation) {
       this.stage = "asking";
       this.rotationAnswer = "pending";
@@ -136,6 +139,7 @@ export class SeatBoard {
 
   private startConfirm() {
     this.stage = "confirming";
+    this.askedAt = this.now().getTime();
     const parties = [...this.bundle!.seekerIds, this.group.captainId];
     this.confirms = new Map(parties.map((id) => [id, "pending"]));
   }
@@ -176,6 +180,39 @@ export class SeatBoard {
       this.search.excluded!.add(id);
       this.run();
     }
+    this.changed();
+  }
+
+  /**
+   * Silence counts as no. An unanswered sub ask or confirmation expires after `ttlMs`, and the
+   * agents move on without anyone having to chase. Returns true if something expired.
+   */
+  expire(nowMs: number, ttlMs: number): boolean {
+    if ((this.stage !== "asking" && this.stage !== "confirming") || nowMs - this.askedAt < ttlMs) return false;
+    if (this.stage === "asking" && this.group.subId) {
+      this.log.push({ level: 2, from: "timer", to: `${this.group.captainId}'s agent`, text: "no answer from the sub in time", ok: false });
+      this.answerRotation(this.group.subId, false, true);
+    } else {
+      const silent = [...this.confirms].find(([, a]) => a === "pending")?.[0];
+      if (silent) {
+        this.log.push({ level: 2, from: "timer", to: "agents", text: "a confirmation timed out", ok: false });
+        this.confirm(silent, false);
+      }
+    }
+    return true;
+  }
+
+  /** After seating, someone can't make it anymore: their seat reopens and the agents re-arrange. */
+  dropOut(id: string) {
+    if (this.stage !== "seated" || !this.bundle) throw new Error("nothing to drop out of");
+    if (this.bundle.seekerIds.includes(id)) this.terms.delete(id);
+    else if (id === this.group.subId) this.group = { ...this.group, subId: null };
+    else throw new Error("nothing to drop out of");
+    this.log.push({ level: 2, from: `${id}'s agent`, to: "agents", text: "can't make it anymore", ok: false });
+    this.stage = "idle";
+    this.search = { excluded: new Set(), versionsPassed: new Set(), rotationDeclined: false };
+    this.run();
+    if (this.stage === "idle") this.stage = "closed";
     this.changed();
   }
 
