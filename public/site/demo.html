@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>open seat — demo</title>
+<meta name="description" content="Open Seat demo: personal agents pair up newcomers, reshape the plan and line up a sub, so solo students can join groups already happening on campus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --paper: #f3eee5; --ink: #2a1e29; --muted: #655960; --rust: #a8431f; --line: #c4b6ab; }
+  * { box-sizing: border-box; margin: 0; }
+  body { min-height: 100vh; background: var(--paper); color: var(--ink); font: 400 16px/1.5 Inter, system-ui, sans-serif; display: grid; place-items: center; padding: 32px 16px; }
+  main { width: min(1080px, 100%); display: grid; gap: 18px; justify-items: center; text-align: center; }
+  .brand { font: 400 40px/1 'Instrument Serif', Georgia, serif; }
+  .brand span { color: var(--rust); }
+  h1 { font: 400 clamp(28px, 4vw, 44px)/1.1 'Instrument Serif', Georgia, serif; }
+  h1 em { color: var(--rust); }
+  video { width: 100%; aspect-ratio: 16 / 9; border-radius: 20px; border: 1px solid var(--line); background: #ebe4d8; }
+  .wait { width: 100%; aspect-ratio: 16 / 9; border-radius: 20px; border: 1px dashed var(--line); display: grid; place-items: center; padding: 24px; }
+  .wait p { max-width: 520px; color: var(--muted); }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  a.pill { display: inline-block; padding: 12px 22px; border-radius: 999px; background: var(--ink); color: var(--paper); text-decoration: none; font: 500 14px 'JetBrains Mono', monospace; }
+  a.pill.ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+  .micro { font: 400 12px 'JetBrains Mono', monospace; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="/site/index.html" style="color:inherit;text-decoration:none">open seat<span>.</span></a>
+  <h1>four requests, none possible alone. <em>one seat.</em></h1>
+  <div id="slot" class="wait"><p>The demo video is being finished. Meanwhile, try the live demo: play Alex, tell your agent your terms, and take your seat.</p></div>
+  <div class="actions">
+    <a class="pill" href="/site/index.html#try">try the live demo ↗</a>
+    <a class="pill ghost" href="https://discord.com/oauth2/authorize?client_id=1563729007642677338&amp;scope=bot&amp;permissions=68608">add to your discord server</a>
+  </div>
+  <p class="micro">devhacks s3 · cubbie track 02 · team southside · all people in the demo are fictional</p>
+</main>
+<script>
+  // Show the video as soon as it's published; until then the live demo is one click away.
+  const src = "media/open-seat-demo.mp4";
+  fetch(src, { method: "HEAD" }).then(r => {
+    if (!r.ok) return;
+    const v = document.createElement("video");
+    Object.assign(v, { controls: true, playsInline: true, preload: "metadata", src, poster: "media/open-seat-demo-poster.jpg" });
+    document.getElementById("slot").replaceWith(v);
+  }).catch(() => {});
+</script>
+</body>
+</html>
