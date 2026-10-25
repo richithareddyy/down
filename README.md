@@ -2,38 +2,37 @@
 
 **The version of the plan everyone's actually down for.**
 
-Everyone said "sounds fun lol" to the $40 club night. One friend can't afford it, one has an early shift, and nobody wants to be the one who says so. With down?, each student tells their own agent how they really feel. The agents negotiate versions of the plan against everyone's private terms and privately ask anyone who'd need to stretch a little. The group gets the version everyone said yes to, and nobody learns who asked for the change.
+down? is a group-planning assistant where every person has their own private agent. Friends tell their agents how they really feel about the group's plan: what they can spend, when they need to be home, what they'd rather skip. The agents test versions of the plan against everyone's private terms, privately ask anyone who would need to stretch a little, and announce the version everyone agreed to without revealing who asked for the change.
 
-DevHacks S3 · Cubbie Hackathon · Track 02 (agent-to-agent coordination) · Team Southside: Charith Kutikuppala & Richitha Rekula
+Built for the Cubbie Hackathon at DevHacks S3, Track 02 (agent-to-agent coordination), by Team Southside.
 
-## Watch the demo
+**[Live site](https://down-kohl.vercel.app) · [Demo video](https://down-kohl.vercel.app/site/media/down-simulation.mp4) · [Discord demo server](https://discord.gg/f36rKZA5z)**
 
-[![down? demo: inside one round. Four private agents, a plan board and one-word answers](public/site/media/down-simulation-poster.jpg)](https://down-kohl.vercel.app/site/media/down-simulation.mp4)
+## Demo
 
-**[▶ Watch: inside one round (1:43)](https://down-kohl.vercel.app/site/media/down-simulation.mp4)** · also on the [website](https://down-kohl.vercel.app/site/index.html#watch)
+[![down? demo: four private agents answer the plan board one word per version](public/site/media/down-simulation-poster.jpg)](https://down-kohl.vercel.app/site/media/down-simulation.mp4)
 
-A simulation of one full round: a $55 concert planned in Discord, four friends DMing their own agents, Claude reading each message into terms, the agents answering the plan board one word per version, a private ask for the one friend who's close, the same question for everyone, and the announcement with no names. It also replays the round with a "no", where the group splits and the friend happy with the original plan is never asked. Every value on screen comes from running that round through this repo's engine (`planFromEvents`, `PlanBoard`, `noteFor`). No voice; sound on for the interaction cues.
+**[Watch the demo (1:43)](https://down-kohl.vercel.app/site/media/down-simulation.mp4)**
 
-## Try it
+A $55 concert is planned in Discord. Four friends message their own agents, each agent turns its student's message into private terms, and the agents answer the plan board with one word per version. The one friend who is close gets a private ask, everyone receives the same question, and the group channel hears the result with no names. The video also shows what happens when that friend declines. Every value on screen comes from running the scenario through the engine in this repository.
 
-- **Website:** https://down-kohl.vercel.app. Scroll to "okay, are you not down?" and play Alex. Type how you feel in your own words (Claude reads it) or use the controls, then answer your agent's private questions. Maya, Jay and Dev are demo friends whose agents answer by themselves.
-- **Discord:** join https://discord.gg/f36rKZA5z, DM the **down?** bot, reply `alex`, then try: `ngl $40 + an uber is a lot. under $10, home by 11, only if 2 others feel the same`. Say `yes` to each step and watch `#general` for the announcement. The bot answers while our server is running.
+## The problem
 
-## Why students need this
+Group plans get made in the group chat, and the first idea tends to stick. People agree to plans they can't afford or don't want because each person assumes they're the only one (pluralistic ignorance; Prentice & Miller, 1993), and groups end up doing something nobody wanted (the Abilene paradox; Harvey, 1974). Money is often the unspoken reason: 44% of young adults say they've skipped a social event because of cost (Ally Bank, 2025). People also overestimate how much friends mind when they decline (Givi & Kirk, 2024).
 
-Group plans get made in the group chat, and the first idea sticks. People say "sounds fun" to plans they can't afford or don't want, because each person thinks they're the only one (pluralistic ignorance: Prentice & Miller, 1993). The group can end up doing something nobody wanted (the Abilene paradox: Harvey, 1974). Money is often the quiet reason: 44% of young adults say they've skipped a social event because of cost (Ally Bank survey, 2025). And people overestimate how much friends mind when they decline (Givi & Kirk, 2024). down? lets a group find out what it actually wants, without anyone having to say why first.
+down? lets a group find the plan it actually wants without anyone having to speak up first.
 
 ## How it works
 
-![How down? works: four students each tell their own agent how they feel, the agents answer one word per version, one private ask goes to the person who would stretch, and the group channel hears the new version with no names](docs/architecture.svg)
+![How down? works: each student tells their own agent how they feel, the agents answer one word per version, a private ask goes only to the person who would stretch, and the group channel hears the new version with no names](docs/architecture.svg)
 
-1. **Say it privately.** In a Discord DM, a student tells their agent things like "$40 + an uber is a lot. under $10, home by 11, only if 2 others feel the same." The agent reads it into terms: whether they'd like a change, a budget, a curfew, things they rule out, and a threshold. The terms are read back, and nothing counts until the student says yes.
-2. **The agents try versions.** A round starts only when at least two people want a change and every one of their thresholds holds, so a change can never point to one person. For each version of the plan, each agent answers one word: fits, close (a small stretch would work) or no.
-3. **Private asks.** If a version is close for someone, only that person is asked: "works for your whole group if you can do $12 instead of $10. ok? nobody will know it was you." A no keeps the limit firm, and the agents try the next version.
-4. **Everyone says yes, privately.** Everyone in the version gets the same question, so the person who's happy with the plan hears exactly what the person who can't afford it hears. A pass sends the agents to the next version.
-5. **The group hears it.** The group channel gets the new version with no names, counts or reasons. If no version fits everyone, the agents offer the one that fits the most people who wanted a change, and the original plan still stands for everyone else.
+1. **Each student talks to their own agent.** In a Discord DM, a student writes something like "$40 + an uber is a lot. under $10, home by 11, only if 2 others feel the same." The agent reads it into terms (whether they'd like a change, a budget, a curfew, kinds of plan they rule out, and a threshold), reads them back, and nothing counts until the student confirms.
+2. **The agents test versions of the plan.** A round starts only when at least two people want a change and all of their thresholds hold, so a change can never be traced to one person. For each version, every agent answers with one word: *fits*, *close* (a small stretch would work) or *no*.
+3. **Private asks.** If a version is close for someone, only that person is asked: "works for your whole group if you can do $12 instead of $10. ok? nobody will know it was you." Declining keeps the limit firm, and the agents move to the next version.
+4. **Private confirmation.** Everyone in the version receives the same question, so the person who's happy with the original plan hears exactly what the person who can't afford it hears. A pass sends the agents to the next version.
+5. **The group hears the result.** The group channel gets the new version with no names, counts or reasons. If no version fits everyone, the agents offer the one that fits the most people who wanted a change, and the original plan still stands for everyone else.
 
-### One round, step by step
+### Example round
 
 ```mermaid
 sequenceDiagram
@@ -63,56 +62,74 @@ sequenceDiagram
     B->>G: "new version of the plan: all of you are down" (no names, no reasons)
 ```
 
-If Alex says no to the ask, the limit stays firm and the agents try the next version. Most of the group gets open mic, and the club night still stands for Jay.
+If Alex declines the ask, the limit stays firm and the agents try the next version: most of the group moves to the open mic, and the club night still stands for Jay.
 
-| Track 2 ask | In down? |
+## Track 02 fit
+
+| Requirement | How down? meets it |
 |---|---|
 | Personal agents for different students | Each person DMs the bot and talks only to their own agent |
-| Conflicting constraints | Budgets, curfews, kinds of plan ruled out, "only if N others" thresholds, and a friend who's happy with the original plan |
-| What they share | One word per version (fits / close / no) and whether their student would like a change. Never words, limits or thresholds |
-| When they ask their students | Before terms count, before stretching a limit (only the person affected), and before switching (everyone in the version) |
-| Shared outcome | The version of the plan everyone confirmed, posted to the group channel |
+| Conflicting constraints | Budgets, curfews, kinds of plan ruled out, "only if N others" thresholds, and friends who are happy with the original plan |
+| What agents share | Whether their student would like a change, and one word per version (fits / close / no). Never messages, limits or thresholds |
+| When agents ask their students | Before terms count, before stretching a limit (only the person affected), and before switching (everyone in the version) |
+| Shared outcome | The version everyone confirmed, posted to the group channel |
 
 ## Where the plan comes from
 
-Groups already plan in Discord. The bot reads the server's scheduled events: the event with `#plan` in its description (or the soonest one) is the group's plan. Other events with a price in the description ("$12", "free") are the versions the agents may try. With no events, the bot uses the demo club night.
+Groups already plan in Discord, so the bot reads the server's scheduled events. The event with `#plan` in its description (or the soonest event) is the group's plan, and other events with a price in the description ("$12", "free") are the versions the agents may try. Without events, the bot uses a built-in demo plan.
 
-## Run it
+## Getting started
 
-Node.js 22+.
+Requires Node.js 22 or later.
 
 ```sh
 npm ci
-cp .env.example .env.local   # add ANTHROPIC_API_KEY and DISCORD_BOT_TOKEN
+cp .env.example .env.local
 npm run dev
 ```
 
-- **Website:** http://localhost:3000. You play Alex in "okay, are you not down?", typing how you feel or using the controls. Maya, Jay and Dev are demo friends. On the server, the site uses the same engine and language model as the bot. Hosted as static files (`public/site`), the same rules run in the browser (`public/site/prototype.js`), and a test checks that both give the same result.
-- **Discord:** invite the bot to a server, DM it, and pick a seat (alex, maya, jay or dev). Seats nobody picks are played by demo friends, so it works with one person or four. DM `reset demo` for a fresh round (seats stay claimed). The bot uses the Direct Messages, Guilds and Guild Scheduled Events intents (no privileged ones). It posts to `DISCORD_GROUP_CHANNEL_ID`, else `#plans`, else `#general`.
-- Without `ANTHROPIC_API_KEY`, a rule-based reader handles budgets, curfews and thresholds.
+| Variable | Purpose |
+|---|---|
+| `DISCORD_BOT_TOKEN` | Runs the Discord bot |
+| `DISCORD_GROUP_CHANNEL_ID` | Optional. Channel for announcements; defaults to `#plans`, then `#general` |
+| `ANTHROPIC_API_KEY` | Optional. Reads messages with a language model; without it, a rule-based reader handles budgets, curfews and thresholds |
+| `ANTHROPIC_MODEL` | Optional. Model used when the key is set |
+
+- **Website:** open http://localhost:3000 and use the "okay, are you not down?" section to play Alex against three demo friends. Served by the app, the site uses the same engine as the bot. Hosted as static files (`public/site`), the same rules run in the browser (`public/site/prototype.js`), and a test keeps both in sync.
+- **Discord:** invite the bot to a server, DM it, and pick a seat (alex, maya, jay or dev). Unclaimed seats are played by demo friends, so it works with one to four people. DM `reset demo` to start a fresh round. The bot needs only the Direct Messages, Guilds and Guild Scheduled Events intents.
+
+## Testing
 
 ```sh
 npm test
 npm run typecheck
 ```
 
-## Built with
+The suite has 59 tests covering how agents judge versions, stretches and thresholds; private asks and passes; what each student can and can't see; the DM conversation; message reading (model and rule-based); reading plans from Discord events; and parity between the in-browser rules and the engine across more than 1,400 combinations of terms and answers.
 
-Next.js 16 and TypeScript · discord.js · Claude (`claude-opus-5-5`) through the Anthropic SDK, with strict JSON output · Vercel for the website · Vitest.
+## Project structure
 
-## Tests
+| Path | Contents |
+|---|---|
+| `src/quorum/engine.ts` | How each agent judges a version, stretches, thresholds, and choosing a version |
+| `src/quorum/board.ts` | One plan's round: private asks, confirmations, passes, the announcement, and each student's view |
+| `src/agents/language.ts` | Reads a student's message into terms (strict JSON schema, with a rule-based fallback) |
+| `src/channels/` | The Discord DM conversation, the bot bridge, and reading plans from Discord events |
+| `src/server/plan-runtime.ts`, `app/api/try` | The live plan for the bot, and a fresh board per website visitor |
+| `public/site/` | The website |
 
-`npm test` runs 59 tests. They cover how agents judge versions, stretches and thresholds; private asks and passes; what each student can and can't see; the DM conversation; reading messages (model and fallback); reading the plan from Discord events; and a check that the website's in-browser rules match the engine across 1,400+ combinations of terms and answers.
+## Tech stack
 
-## Code
+Next.js 16 · TypeScript · discord.js · Anthropic SDK (optional message reading) · Zod · Vitest · Vercel
 
-- `src/quorum/engine.ts`: how each agent judges a version, private stretches, thresholds, and picking a version.
-- `src/quorum/board.ts`: one plan's round, covering private asks, private yeses, passes, the announcement, and what each student is allowed to see.
-- `src/agents/language.ts`: reads a student's message into terms (Claude with a strict JSON schema, plus a rule-based fallback).
-- `src/channels/`: the Discord DM conversation, the bridge, and reading the plan from Discord events.
-- `src/server/plan-runtime.ts` and `app/api/try`: the live plan for the bot, and a fresh board per website visitor.
-- `public/site/`: the website.
+## Privacy model
 
-## Privacy, honestly
+This is a prototype's privacy model, not a security guarantee. All agents run on one server, which holds each student's terms; the protocol limits what crosses between agents to one-word answers and what each student sees to their own view. A round never starts with fewer than two people wanting a change, and everyone receives the same question, but in a small group people can still guess. Names, counts and reasons are never posted. All people, events and prices in the demo are fictional, and nothing is booked or paid.
 
-This is a prototype's privacy model, not a security guarantee. The server that runs the agents sees their one-word answers. Nothing starts with fewer than two people wanting a change, and everyone gets the same question, but in a small group people can still guess. No names, counts or reasons are ever posted. All people, events and prices in the demo are fictional; nothing is booked or paid.
+## Team
+
+Team Southside: **Charith Kutikuppala** and **Richitha Rekula**.
+
+## License
+
+[MIT](LICENSE)

@@ -174,10 +174,10 @@ em { font-style: italic; color: var(--rust); }
 .section-head { text-align: center; }
 .section-sub { color: var(--ink-soft); max-width: 32em; margin: 26px auto 0; }
 
-.watch { padding-bottom: clamp(40px, 6vw, 80px); }
-.watch-frame { max-width: 1080px; margin: clamp(32px, 5vw, 56px) auto 0; }
-.watch-frame video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius); border: 1px solid var(--line-strong); background: var(--paper-deep); }
-.watch-frame figcaption { margin-top: 14px; text-align: center; }
+.demo { padding-bottom: clamp(40px, 6vw, 80px); }
+.demo-frame { max-width: 1080px; margin: clamp(32px, 5vw, 56px) auto 0; }
+.demo-frame video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius); border: 1px solid var(--line-strong); background: var(--paper-deep); }
+.demo-frame figcaption { margin-top: 14px; text-align: center; }
 
 .problem { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(40px, 7vw, 110px); align-items: start; }
 .problem-copy { padding-top: 46px; color: var(--ink-soft); max-width: 31em; display: grid; gap: 18px; }
