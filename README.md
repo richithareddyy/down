@@ -4,7 +4,7 @@
 
 The pickup game needs two more. The study table has empty chairs. A mutual friend's dinner has open seats. You'd join, just not as the only new one, and not by walking up to strangers alone. Open Seat gives everyone a private agent. The agents pair up newcomers, reshape the plan so it fits everyone, and ping you once: your seat is ready.
 
-**[Live site](https://open-seat-asu.vercel.app) · [Add to your Discord server](https://discord.com/oauth2/authorize?client_id=1563729007642677338&scope=bot&permissions=68608) · [Try it on our server](https://discord.gg/f36rKZA5z)**
+**[Live site](https://open-seat-asu.vercel.app) · [Demo video](https://open-seat-asu.vercel.app/demo) · [Add to your Discord server](https://discord.com/oauth2/authorize?client_id=1563729007642677338&scope=bot&permissions=68608) · [Try it on our server](https://discord.gg/f36rKZA5z)**
 
 DevHacks S3 · Cubbie Hackathon · Track 02, Agent-to-Agent Coordination · Team Southside
 
