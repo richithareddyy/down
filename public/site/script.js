@@ -1,4 +1,4 @@
-import { DEFAULT_ALEX, VERSIONS, tryPlan } from './prototype.js?v=5';
+import { DEFAULT_ALEX, VERSIONS, tryPlan } from './prototype.js?v=6';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.documentElement.classList.add('js');
@@ -40,11 +40,24 @@ const revealables = document.querySelectorAll('[data-reveal]');
 if ('IntersectionObserver' in window && !reduceMotion) {
   const io = new IntersectionObserver(entries => {
     for (const entry of entries) if (entry.isIntersecting) { entry.target.classList.add('in'); io.unobserve(entry.target); }
-  }, { threshold: .14 });
+  }, { threshold: 0, rootMargin: '0px 0px -6% 0px' });
   revealables.forEach(el => io.observe(el));
 } else {
   revealables.forEach(el => el.classList.add('in'));
 }
+// Jumping to a section (nav links, #try in the address bar) shows it right away, not after a fade.
+const showSection = hash => {
+  const target = hash && hash.length > 1 ? document.getElementById(hash.slice(1)) : null;
+  if (!target) return;
+  target.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('in'));
+  if (target.matches('[data-reveal]')) target.classList.add('in');
+};
+document.addEventListener('click', event => {
+  const link = event.target.closest('a[href^="#"]');
+  if (link) showSection(link.getAttribute('href'));
+});
+window.addEventListener('hashchange', () => showSection(location.hash));
+showSection(location.hash);
 
 /* ---------- how: the stage follows the step in view ---------- */
 const stage = document.querySelector('.stage');
