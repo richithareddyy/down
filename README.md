@@ -4,9 +4,16 @@
 
 Everyone said "sounds fun lol" to the $40 club night. One friend can't afford it, one has an early shift, and nobody wants to be the one who says so. With down?, each student tells their own agent how they really feel. The agents negotiate versions of the plan against everyone's private terms and privately ask anyone who'd need to stretch a little. The group gets the version everyone said yes to, and nobody learns who asked for the change.
 
-**Live site:** https://down-kohl.vercel.app
-
 DevHacks S3 · Cubbie Hackathon · Track 02 (agent-to-agent coordination) · Team Southside: Charith Kutikuppala & Richitha Rekula
+
+## Try it
+
+- **Website:** https://down-kohl.vercel.app. Scroll to "okay, are you not down?" and play Alex. Type how you feel in your own words (Claude reads it) or use the controls, then answer your agent's private questions. Maya, Jay and Dev are demo friends whose agents answer by themselves.
+- **Discord:** join https://discord.gg/f36rKZA5z, DM the **down?** bot, reply `alex`, then try: `ngl $40 + an uber is a lot. under $10, home by 11, only if 2 others feel the same`. Say `yes` to each step and watch `#general` for the announcement. The bot answers while our server is running.
+
+## Why students need this
+
+Group plans get made in the group chat, and the first idea sticks. People say "sounds fun" to plans they can't afford or don't want, because each person thinks they're the only one (pluralistic ignorance: Prentice & Miller, 1993). The group can end up doing something nobody wanted (the Abilene paradox: Harvey, 1974). Money is often the quiet reason: 44% of young adults say they've skipped a social event because of cost (Ally Bank survey, 2025). And people overestimate how much friends mind when they decline (Givi & Kirk, 2024). down? lets a group find out what it actually wants, without anyone having to say why first.
 
 ## How it works
 
@@ -80,6 +87,14 @@ npm run dev
 npm test
 npm run typecheck
 ```
+
+## Built with
+
+Next.js 16 and TypeScript · discord.js · Claude (`claude-opus-5-5`) through the Anthropic SDK, with strict JSON output · Vercel for the website · Vitest.
+
+## Tests
+
+`npm test` runs 59 tests. They cover how agents judge versions, stretches and thresholds; private asks and passes; what each student can and can't see; the DM conversation; reading messages (model and fallback); reading the plan from Discord events; and a check that the website's in-browser rules match the engine across 1,400+ combinations of terms and answers.
 
 ## Code
 
