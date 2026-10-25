@@ -6,6 +6,14 @@ Everyone said "sounds fun lol" to the $40 club night. One friend can't afford it
 
 DevHacks S3 · Cubbie Hackathon · Track 02 (agent-to-agent coordination) · Team Southside: Charith Kutikuppala & Richitha Rekula
 
+## Watch the demo
+
+[![down? demo: inside one round. Four private agents, a plan board and one-word answers](public/site/media/down-simulation-poster.jpg)](https://down-kohl.vercel.app/site/media/down-simulation.mp4)
+
+**[▶ Watch: inside one round (1:43)](https://down-kohl.vercel.app/site/media/down-simulation.mp4)** · also on the [website](https://down-kohl.vercel.app/site/index.html#watch)
+
+A simulation of one full round: a $55 concert planned in Discord, four friends DMing their own agents, Claude reading each message into terms, the agents answering the plan board one word per version, a private ask for the one friend who's close, the same question for everyone, and the announcement with no names. It also replays the round with a "no", where the group splits and the friend happy with the original plan is never asked. Every value on screen comes from running that round through this repo's engine (`planFromEvents`, `PlanBoard`, `noteFor`). No voice; sound on for the interaction cues.
+
 ## Try it
 
 - **Website:** https://down-kohl.vercel.app. Scroll to "okay, are you not down?" and play Alex. Type how you feel in your own words (Claude reads it) or use the controls, then answer your agent's private questions. Maya, Jay and Dev are demo friends whose agents answer by themselves.
