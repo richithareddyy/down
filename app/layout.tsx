@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
-import "./globals.css";
 export const metadata: Metadata = {
-  title: "down? — less “we should.” more “we did.”",
+  title: "down? — the version of the plan everyone’s actually down for.",
   description:
-    "Find the plans hiding in your friend group. Private interests. A workable crew. One mutual reveal.",
+    "Tell your agent how you really feel about the group's plan. The agents negotiate a version everyone can do, and nobody learns who asked.",
 };
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>{children}</body>

@@ -1,7 +1,11 @@
 import { expect, test } from "vitest";
 import { checkConditions } from "../src/domain/constraints";
-import { events, students } from "../src/demo/seed";
+import { students } from "../src/demo/seed";
 import type { Conditions, CampusEvent, ReasonCode } from "../src/domain/types";
+// A fictional beginner dance workshop, used to exercise every kind of limit.
+const events: CampusEvent[] = [
+  { id: "dance", title: "beginner dance workshop", activityTags: ["dance"], beginnerFriendly: true, day: "sat", start: "17:00", end: "18:00", price: 8, date: "2026-10-31", timeZone: "America/Phoenix", location: "Fictional campus studio", accessible: true, synthetic: true },
+];
 const check = (
   c: Conditions,
   e: CampusEvent = events[0],
@@ -53,3 +57,30 @@ test("approved friend must be present; duplicate members do not inflate count", 
     ]).verdict,
   ).toBe("reject");
 });
+
+test.each<[Partial<Conditions>, Partial<CampusEvent>, ReasonCode]>([
+  [{ startsAfter: "18:30" }, {}, "STARTS_TOO_EARLY"],
+  [{ dates: ["2026-11-01"] }, {}, "WRONG_DATE"],
+  [{ locations: ["Other studio"] }, {}, "WRONG_LOCATION"],
+  [{ maxGroupSize: 2 }, {}, "GROUP_TOO_LARGE"],
+  [{ eventIds: ["mic"] }, {}, "WRONG_EVENT"],
+  [
+    { accessibleOnly: true },
+    { accessible: undefined },
+    "UNKNOWN_EVENT_DETAILS",
+  ],
+  [{ dates: ["2026-10-31"] }, { date: undefined }, "UNKNOWN_EVENT_DETAILS"],
+  [{ maxPrice: 20 }, { price: NaN }, "UNKNOWN_EVENT_DETAILS"],
+  [
+    { timeZone: "America/Phoenix" },
+    { timeZone: undefined },
+    "UNKNOWN_EVENT_DETAILS",
+  ],
+])(
+  "enforces explicit constraints and rejects unknown event facts %j",
+  (c, e, reasonCode) => {
+    expect(
+      check({ activityTags: ["dance"], ...c }, { ...events[0], ...e }),
+    ).toEqual({ verdict: "reject", reasonCode });
+  },
+);

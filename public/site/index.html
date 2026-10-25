@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f3eee5">
+<meta name="description" content="Down? finds the version of your group’s plan everyone is actually down for. Tell your agent how you really feel; the agents negotiate versions against everyone’s private terms, ask anyone who’d need to stretch in private, and nobody learns who asked for the change.">
+<title>down? — the version of the plan everyone’s actually down for.</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232a1e29'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-family='Georgia,serif' font-size='40' fill='%23f3eee5'%3Ed%3C/text%3E%3Ccircle cx='47' cy='42' r='4' fill='%23b4532a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css?v=5">
+<script type="module" src="./script.js?v=5"></script>
+</head>
+<body>
+<a class="skip" href="#main">skip to content</a>
+
+<header class="nav wrap">
+  <a class="brand" href="#top" aria-label="Down? home">down<span>?</span></a>
+  <nav aria-label="Main">
+    <a href="#how">how it works</a>
+    <a href="#privacy">privacy</a>
+    <a href="#live">live demo</a>
+    <a class="pill pill-sm" href="#try">try it <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="hero" id="top">
+  <div class="wrap hero-copy">
+    <p class="eyebrow" data-reveal><span class="dot" aria-hidden="true"></span>devhacks s3 / cubbie track 02<span class="hide-sm"> / agent-to-agent</span></p>
+    <h1 data-reveal>the plan your group<br><em class="typed" data-words="actually wants.|can afford.|would pick.">actually wants.</em></h1>
+    <p class="lede" data-reveal>Everyone said “sounds fun lol” to the $40 club night. One of you can’t afford it, one has an early shift, and nobody wants to be the one who says so. Tell your agent how you really feel. The agents negotiate versions of the plan against everyone’s private terms, and the group gets the one everyone’s actually down for. Nobody learns who asked.</p>
+    <div class="hero-actions" data-reveal>
+      <a class="pill" href="#try">play it out <span aria-hidden="true">↗</span></a>
+      <a class="text-link" href="#how">see how the agents negotiate <span aria-hidden="true">↓</span></a>
+    </div>
+  </div>
+
+  <figure class="scene-frame wrap-wide" role="img" aria-label="Illustration: a dorm at night with four lit windows. Threads from the windows quietly meet at a new version of the plan across the street.">
+    <svg class="scene" viewBox="0 0 1200 640" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+<defs>
+<pattern id="h-ink" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(32)"><path d="M0 0V5" stroke="var(--ink)" stroke-width=".7"/></pattern>
+<pattern id="h-ink-dense" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(32)"><path d="M0 0V3.2" stroke="var(--ink)" stroke-width=".8"/></pattern>
+<pattern id="h-ink-light" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)"><path d="M0 0V7" stroke="var(--ink)" stroke-width=".5"/></pattern>
+<pattern id="h-rust" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V4" stroke="var(--rust)" stroke-width=".9"/></pattern>
+<pattern id="h-ground" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-12)"><path d="M0 0H6" stroke="var(--ink)" stroke-width=".55"/></pattern>
+<radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="var(--rust)" stop-opacity=".5"/><stop offset="1" stop-color="var(--rust)" stop-opacity="0"/></radialGradient>
+</defs>
+<g class="sky" stroke="var(--ink)" stroke-linecap="round">
+<path d="M177.9 123.6 L201.3 123.5 L225.1 124.7 L249.2 123.6 L273.2 125.6 L296.7 125.2 L320.3 125.3" stroke-width="0.5" opacity="0.2"/>
+<path d="M245.5 31.6 L253.4 31.6 L260.9 31.5 L268.6 31.4 L276 32.3 L284.2 32 L291.5 31.3" stroke-width="0.9" opacity="0.2"/>
+<path d="M864.2 120.4 L884.6 120.9 L903.9 119.7 L924.6 120 L944.6 119.8 L964 120.1 L984.3 119.7" stroke-width="0.9" opacity="0.3"/>
+<path d="M854.5 99.4 L864.8 99.5 L875.5 98.7 L886.2 97.6 L897.1 97.1 L907.6 96.7 L918.1 97" stroke-width="0.7" opacity="0.1"/>
+<path d="M208.6 86.5 L228.2 87.5 L248 86.3 L268.3 86.6 L287.7 86.3 L307.4 87.4 L327.5 87.3" stroke-width="0.6" opacity="0.3"/>
+<path d="M530.8 178.9 L556.4 179.3 L582.7 177.8 L608 178.3 L634.4 177.1 L660.2 178 L685.7 177" stroke-width="0.8" opacity="0.2"/>
+<path d="M241.3 263.5 L271.5 263.4 L301.4 264.5 L331.5 264 L362 265.4 L392.2 264.7 L422.2 265.4" stroke-width="1" opacity="0.1"/>
+<path d="M395.2 184.3 L421.2 185 L446.8 184.4 L472.4 183.3 L497.8 182.9 L524.2 184 L549.6 183.5" stroke-width="1" opacity="0.1"/>
+<path d="M336.3 19.4 L376.5 20.1 L416.4 19.8 L456.5 20.3 L496.1 19.9 L536.5 20.3 L576.2 19.6" stroke-width="0.7" opacity="0.1"/>
+<path d="M411.2 232.5 L437.3 233 L463.6 232.1 L489.3 231.7 L515.6 230.8 L541.8 229.7 L567.7 230" stroke-width="0.9" opacity="0.1"/>
+<path d="M784 21.8 L807.1 21.4 L830.4 23 L853.5 22.5 L877.3 23.8 L900.2 24.6 L923.5 24.4" stroke-width="0.6" opacity="0.3"/>
+<path d="M1038.8 206.5 L1074.7 206 L1110.8 207.3 L1147.1 207.2 L1183.1 206.5 L1218.6 206.9 L1254.8 207" stroke-width="0.6" opacity="0.1"/>
+<path d="M332.1 54.7 L366.5 53.9 L401.7 53.8 L436.2 54.7 L470.6 55.1 L505 53.9 L540 54.5" stroke-width="0.7" opacity="0.3"/>
+<path d="M15.4 26.1 L43.1 26.8 L71 26.7 L98.1 26.4 L125.7 25.7 L153.6 27.1 L181.2 26.9" stroke-width="0.6" opacity="0.2"/>
+<path d="M685 59.2 L717.2 58.8 L749.1 60.2 L780.4 60 L812.6 61.1 L844.3 60.8 L876.3 61" stroke-width="1" opacity="0.2"/>
+<path d="M201.8 256.5 L232.7 256.1 L263.5 257.6 L294.3 257 L324.9 256.7 L355.7 257.8 L386.2 257.3" stroke-width="0.7" opacity="0.2"/>
+<path d="M535.2 32.8 L543 31.7 L550.3 32.4 L557.8 30.8 L565.7 31.4 L573.5 30.9 L580.9 30.2" stroke-width="1" opacity="0.3"/>
+<path d="M581.5 247.1 L597.8 247.9 L614.2 247.1 L630.4 248.2 L647.1 247.1 L663.4 248.7 L679.5 247.9" stroke-width="0.8" opacity="0.2"/>
+<path d="M674.2 154.2 L681.7 154.8 L689.4 154.2 L697.1 153.5 L704.6 154.1 L712.5 155.1 L719.7 154.3" stroke-width="0.6" opacity="0.3"/>
+<path d="M1022.7 141.7 L1045.3 142.2 L1067.5 141.6 L1090 140.3 L1112.7 140.8 L1135.3 139.9 L1158 139.9" stroke-width="0.8" opacity="0.1"/>
+<path d="M255.7 77.8 L268.8 77.5 L282.2 77 L295.2 77.8 L308.8 77.6 L322.2 77.6 L335.2 77.4" stroke-width="1" opacity="0.2"/>
+<path d="M332.7 42.6 L350.3 43 L366.8 41.6 L384.4 41.3 L401.1 42.1 L418.5 41.7 L435.7 40.9" stroke-width="0.5" opacity="0.3"/>
+<path d="M765.2 292.4 L802.3 292.5 L839.3 292 L876.1 290.5 L913.1 290 L950.5 290.5 L987.5 290.1" stroke-width="0.8" opacity="0.2"/>
+<path d="M1128.6 79.3 L1166.4 78.8 L1203.9 78.1 L1241.2 78 L1278.8 77.8 L1316 77.5 L1353.9 76.7" stroke-width="1" opacity="0.1"/>
+<path d="M190.2 40.8 L202.7 40.9 L214.7 40.5 L226.8 39.2 L239 38.9 L251.4 38.9 L263.3 37.9" stroke-width="0.6" opacity="0.2"/>
+<path d="M998.2 258.4 L1028 259.1 L1057.6 258.7 L1087.7 258.4 L1117.4 259.8 L1147.4 259.3 L1177.2 260" stroke-width="1" opacity="0.2"/>
+<path d="M589 161.8 L608.8 162.4 L628.7 161.3 L648.1 162.7 L667.5 162.2 L687 162 L707 162.7" stroke-width="0.7" opacity="0.3"/>
+<path d="M630.2 38.1 L669.7 38.6 L710.1 37.9 L750 38.5 L789.5 38.8 L829.4 39.9 L869.2 40" stroke-width="0.5" opacity="0.3"/>
+<path d="M733 171.2 L758.2 170.6 L783.6 170.8 L808.8 172.3 L834.4 172.8 L860 171.5 L885.2 172.5" stroke-width="1" opacity="0.1"/>
+<path d="M1066 182.6 L1097 183.2 L1127.2 183.8 L1158.2 183.5 L1188.7 184.5 L1219.5 184.9 L1250.5 185.5" stroke-width="0.9" opacity="0.1"/>
+<path d="M878 113 L902.5 112.9 L926.4 114.6 L951.3 114.5 L975.3 114.4 L999.9 115.3 L1024.2 115.7" stroke-width="0.8" opacity="0.3"/>
+<path d="M1116.1 251.1 L1152.9 250.2 L1190.4 250.4 L1227.4 249.8 L1264.5 248.5 L1302.2 248.9 L1339.2 248.3" stroke-width="0.8" opacity="0.2"/>
+<path d="M838.9 156.8 L873.7 156.6 L908.3 155.5 L942.7 155.2 L977.6 155 L1012.1 155.8 L1046.6 154.5" stroke-width="0.6" opacity="0.1"/>
+<path d="M992.7 177.6 L1002 178 L1011.1 178.3 L1020.3 177.3 L1030 177.1 L1039 178.4 L1048.4 178" stroke-width="0.9" opacity="0.1"/>
+<path d="M392.3 99.4 L403.2 100.3 L413.8 99.5 L424.3 99.3 L434.5 99.5 L445.6 100.5 L455.8 99.9" stroke-width="0.6" opacity="0.2"/>
+<path d="M417.3 121.2 L430.5 122.1 L443.7 121.2 L457 122.8 L469.8 121.5 L483.2 122.8 L496.3 123" stroke-width="0.8" opacity="0.2"/>
+<path d="M829.7 265.8 L866.1 266.3 L903.1 265.6 L939.4 266.6 L976.3 266.8 L1012.8 266.1 L1049.5 266.6" stroke-width="1" opacity="0.1"/>
+<path d="M795.6 188.3 L832.9 189.2 L870.2 189.5 L907.4 190.1 L944.4 189.6 L981.6 190.4 L1018.6 190.2" stroke-width="0.7" opacity="0.1"/>
+<path d="M403.1 81.6 L415.2 82.3 L427.3 81.1 L439.6 81.6 L452.3 80.7 L464.1 81.1 L476.6 81.1" stroke-width="0.8" opacity="0.1"/>
+<path d="M806.3 62.9 L832.7 61.9 L859.5 61.9 L885.9 62.5 L912.3 61.2 L939.1 62 L965.3 61" stroke-width="0.7" opacity="0.1"/>
+<path d="M18.7 155.7 L56.9 155.6 L95 156.3 L133.5 154.9 L171.3 155.2 L209.8 155.7 L248.2 155" stroke-width="0.9" opacity="0.2"/>
+<path d="M266.1 252.6 L302.1 252.3 L337.4 252.2 L373.2 252.1 L408.9 253.7 L444.6 252.5 L480 253.4" stroke-width="0.6" opacity="0.1"/>
+<path d="M1041.8 85.9 L1051.5 85.6 L1060.9 85.9 L1070.7 84.7 L1080.3 84.4 L1090.2 84.8 L1100 84.1" stroke-width="0.7" opacity="0.3"/>
+<path d="M240.2 128.3 L266 128.4 L291 127.6 L316.5 126.6 L342.1 126 L367.5 125.7 L393 125.4" stroke-width="0.9" opacity="0.2"/>
+<path d="M1075.1 53.3 L1100.8 52.4 L1125.7 52.2 L1151.6 53.2 L1176.6 52.4 L1202.5 52.6 L1227.7 52.3" stroke-width="0.5" opacity="0.3"/>
+<path d="M45.8 131.2 L83.2 131.7 L120.7 131 L157.7 131 L194.8 131 L232.7 132.1 L269.9 131.2" stroke-width="0.9" opacity="0.2"/>
+<path d="M363.8 351.5 L392.2 351.9 L420.8 351.5 L448.7 351.6 L477.6 351.1 L505.5 350.9 L534 350.8" stroke-width="0.5" opacity="0.1"/>
+<path d="M945.9 208.6 L958.9 208 L972.2 209 L985.8 208.7 L999.2 208.9 L1012.1 208.6 L1025.4 209.4" stroke-width="1" opacity="0.2"/>
+<path d="M621.2 44.6 L636.9 45.2 L651.9 46.1 L667.5 46.7 L682.9 46.7 L698.8 46.5 L714.1 47.5" stroke-width="0.8" opacity="0.3"/>
+<path d="M830.5 76 L849.5 75.7 L869.2 75.9 L888.5 77 L907.8 77.2 L927.2 77.6 L946.8 77.8" stroke-width="0.6" opacity="0.2"/>
+<path d="M696.1 200.8 L725.7 201.9 L755.6 201.9 L785 201.4 L814.7 202.5 L844.3 202.1 L873.9 202.3" stroke-width="0.7" opacity="0.2"/>
+<path d="M665.1 17.6 L696.5 17 L728.5 17.8 L760.2 17.1 L792.1 18 L823.5 17.7 L855.5 18.2" stroke-width="0.7" opacity="0.2"/>
+<path d="M221.7 208.4 L253 209.3 L284.5 209.2 L316.7 208.7 L347.7 209.6 L379.3 209.6 L411 210.8" stroke-width="1" opacity="0.1"/>
+<path d="M1113.2 99.8 L1135.9 100.3 L1157.8 100 L1180.3 99.1 L1202.6 99.6 L1225.7 98.2 L1247.7 98.5" stroke-width="0.8" opacity="0.1"/>
+<path d="M816.4 158 L833.7 157.7 L850.8 159.5 L867.7 158.4 L884.6 159.1 L902.1 159.3 L919 160.2" stroke-width="0.6" opacity="0.2"/>
+<path d="M741.2 44.8 L777.2 45.3 L813.6 43.8 L849.7 43.2 L886.1 43.6 L921.9 43.5 L958.1 43.1" stroke-width="0.5" opacity="0.2"/>
+<path d="M62.9 222.2 L78.9 222 L95 222.4 L111.7 220.6 L127.5 221.6 L143.6 221.7 L159.9 220.7" stroke-width="0.7" opacity="0.2"/>
+<path d="M736.8 46.9 L769.8 47.3 L802.3 47.8 L834.8 47.5 L867.6 47.2 L900.4 46.9 L933.3 47" stroke-width="0.9" opacity="0.2"/>
+<path d="M221.1 296.6 L247.1 296.5 L273.1 296.3 L298.8 294.6 L324.7 294.7 L351 294.2 L377.1 293.8" stroke-width="0.6" opacity="0.1"/>
+<path d="M327 206.1 L335.1 205.8 L343.2 205.6 L351.5 205.9 L359.1 206 L367.5 207.3 L375.5 206.9" stroke-width="0.9" opacity="0.1"/>
+<path d="M1105.2 34.7 L1113.7 34.3 L1121.3 35.7 L1129.1 35 L1137.8 35.1 L1145.5 35.7 L1153.7 36.3" stroke-width="0.7" opacity="0.2"/>
+<path d="M1060.3 109.7 L1079.2 109.4 L1097.8 110.9 L1116.4 110.9 L1135.6 112.3 L1154.4 112.8 L1173.1 112.6" stroke-width="0.7" opacity="0.2"/>
+<path d="M214.2 127.3 L232.2 126.8 L250.5 127.3 L268.8 127.3 L287.5 127.8 L305.7 127 L323.6 127.6" stroke-width="0.7" opacity="0.1"/>
+<path d="M-18.1 38.4 L-5.1 38.7 L7.2 38 L19.9 38.9 L32.7 38.5 L45.7 38.6 L58.3 37.8" stroke-width="0.5" opacity="0.2"/>
+<path d="M343.8 189 L376.1 188.1 L408.2 187.5 L440.9 186.8 L473.1 187.1 L505.6 186.1 L537.9 186.3" stroke-width="0.9" opacity="0.2"/>
+<path d="M201.7 60 L217.6 60.6 L233.5 59.4 L249.6 59.2 L265.4 58.8 L281.8 59.6 L297.7 59.4" stroke-width="0.9" opacity="0.3"/>
+<path d="M746.6 256.8 L785.2 255.8 L823.5 256.1 L861.8 255.8 L900.5 255.7 L938.9 254.9 L977.6 255.2" stroke-width="0.7" opacity="0.2"/>
+<path d="M69.8 105.2 L87.9 105.2 L106 104.8 L123.6 103.9 L141.9 103 L160 102.6 L178.2 103.1" stroke-width="0.7" opacity="0.2"/>
+<path d="M-12.2 199.6 L5.8 199.9 L24 199.6 L42.6 200.6 L60.6 200 L79.3 200.4 L97.2 200" stroke-width="0.8" opacity="0.2"/>
+<path d="M938.9 193 L974.6 192.8 L1010.9 193.5 L1046.8 195.1 L1082.6 194.1 L1118.7 195.4 L1154.9 195.5" stroke-width="0.6" opacity="0.1"/>
+</g>
+<g class="stars" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round">
+<path d="M212 235V241M209 238H215" opacity=".55"/>
+<path d="M318 285.6V294.4M313.6 290H322.4" opacity=".55"/>
+<path d="M468 40V48M464 44H472" opacity=".55"/>
+<path d="M612 88.4V95.6M608.4 92H615.6" opacity=".55"/>
+<path d="M705 35.8V44.2M700.8 40H709.2" opacity=".55"/>
+<path d="M858 65.4V74.6M853.4 70H862.6" opacity=".55"/>
+<path d="M1150 325.6V334.4M1145.6 330H1154.4" opacity=".55"/>
+<path d="M90 295.4V304.6M85.4 300H94.6" opacity=".55"/>
+<path d="M560 233.6V242.4M555.6 238H564.4" opacity=".55"/>
+<path d="M760 204.9V215.1M754.9 210H765.1" opacity=".55"/>
+<path d="M430 254.6V265.4M424.6 260H435.4" opacity=".55"/>
+<path d="M1000 296.2V303.8M996.2 300H1003.8" opacity=".55"/>
+</g>
+<g class="moon"><circle cx="600" cy="96" r="30" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.2"/><path d="M600 66A30 30 0 0 0 600 126A22 30 0 0 1 600 66Z" fill="url(#h-ink)" opacity=".8"/></g>
+<g transform="translate(0 120)">
+<path class="butte" d="M330 440 C 380 400, 420 330, 486 318 C 530 310, 560 300, 600 312 C 650 326, 700 380, 760 440 Z" fill="url(#h-ink-light)" stroke="var(--ink)" stroke-width=".9" opacity=".75"/>
+<g class="palm">
+<path d="M612 440 C 616.2 370, 623.2 322, 626 262" stroke="var(--ink)" stroke-width="5.5" stroke-linecap="round"/>
+<path d="M612 440 C 616.2 370, 623.2 322, 626 262" stroke="var(--paper)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2.5 3.5"/>
+<path d="M626 262 Q 592.5 246.1 564.9 278.8" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M615 258 l-1.2 10.4" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M604.3 256.8 l-1.5 9.6" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M594 258.2 l1.6 9.4" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M584 262.4 l3.7 10.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M574.3 269.2 l-2.7 9.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M626 262 Q 600 230.1 578.5 264.7" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M617.4 253.2 l-0.1 8.8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M609.1 248.1 l-1 7.4" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M601.1 246.8 l2 8.7" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M593.3 249 l-2.1 7.2" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M585.8 255 l-1.4 6.9" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M626 262 Q 611.6 221.2 599.8 256.8" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M621.3 250.5 l0.1 6.6" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M616.7 243.3 l-3.5 6.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M612.3 240.3 l-3.2 9.5" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M608 241.6 l-3.1 8.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M603.8 247.1 l2.2 8.4" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M626 262 Q 640.4 221.2 652.2 256.8" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M630.7 250.5 l-2.7 10.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M635.3 243.3 l3 6.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M639.7 240.3 l-2 8.5" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M644 241.6 l2.4 8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M648.2 247.1 l1.7 7.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M626 262 Q 652 230.1 673.5 264.7" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M634.6 253.2 l1.7 7.6" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M642.9 248.1 l-1.3 9.8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M650.9 246.8 l2.7 10.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M658.7 249 l0.5 8.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M666.2 255 l1.7 9.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M626 262 Q 659.5 246.1 687.1 278.8" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M637 258 l2.6 10" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M647.7 256.8 l-3 7.9" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M658 258.2 l1.4 7.2" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M668 262.4 l-2.5 6.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M677.7 269.2 l0.7 10.7" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M626 262 Q 594.1 240.4 567.7 273.7" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M615.5 256.3 l3.8 6.7" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M605.3 253.7 l1.5 8.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M595.5 254.1 l1.1 8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M585.9 257.6 l3.5 10.9" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M576.7 264.1 l-3.6 9.6" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+</g>
+<g class="palm">
+<path d="M724 440 C 721.0 370, 716.0 296, 714 236" stroke="var(--ink)" stroke-width="5.5" stroke-linecap="round"/>
+<path d="M724 440 C 721.0 370, 716.0 296, 714 236" stroke="var(--paper)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2.5 3.5"/>
+<path d="M714 236 Q 680.5 220.1 652.9 252.8" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M703 232 l-3.1 6.2" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M692.3 230.8 l-1.7 9.7" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M682 232.2 l3.9 6.6" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M672 236.4 l-1.4 6.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M662.3 243.2 l0.3 8.4" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M714 236 Q 688 204.1 666.5 238.7" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M705.4 227.2 l-1 7.5" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M697.1 222.1 l2.4 10.2" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M689.1 220.8 l-1.7 8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M681.3 223 l0.9 9.8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M673.8 229 l3.8 7.9" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M714 236 Q 699.6 195.2 687.8 230.8" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M709.3 224.5 l1.6 8.7" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M704.7 217.3 l2.4 6.7" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M700.3 214.3 l-2.6 6.5" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M696 215.6 l3.5 7.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M691.8 221.1 l-0.1 6.6" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M714 236 Q 728.4 195.2 740.2 230.8" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M718.7 224.5 l-1.4 6.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M723.3 217.3 l0.5 6.7" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M727.7 214.3 l1 7.4" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M732 215.6 l-2.2 8.4" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M736.2 221.1 l-1.1 7.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M714 236 Q 740 204.1 761.5 238.7" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M722.6 227.2 l-3.6 6.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M730.9 222.1 l3.1 7.5" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M738.9 220.8 l-3.4 6.9" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M746.7 223 l-0.1 11" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M754.2 229 l-2.4 10.3" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M714 236 Q 747.5 220.1 775.1 252.8" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M725 232 l-0.1 8.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M735.7 230.8 l2.5 8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M746 232.2 l-3.5 8.8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M756 236.4 l1.3 9.1" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M765.7 243.2 l-1.8 10.7" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M714 236 Q 682.1 214.4 655.7 247.7" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M703.5 230.3 l2.9 11" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M693.3 227.7 l-0.5 10.2" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M683.5 228.1 l1.8 6.9" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M673.9 231.6 l-3.8 6.8" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+<path d="M664.7 238.1 l-3 6.4" stroke="var(--ink)" stroke-width=".9" stroke-linecap="round"/>
+</g>
+<g class="dorm">
+<path d="M470 236 L506 252 L506 440 L470 440 Z" fill="url(#h-ink)" stroke="var(--ink)" stroke-width="1.2"/>
+<rect x="70" y="236" width="400" height="204" fill="var(--card)" stroke="var(--ink)" stroke-width="1.4"/>
+<path d="M62 236H478M62 228H478V236M62 228V236" stroke="var(--ink)" stroke-width="1.2"/>
+<path d="M74 248 L123 248.2 L171.9 248 L220.8 247.8 L270.1 247.6 L319 248.2 L368.1 248.2 L417 248.2 L466 248" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<path d="M74 270 L123.1 270.2 L172.2 269.7 L221.1 269.9 L270.1 269.8 L319.1 269.6 L368 269.8 L417 269.9 L466 270" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<path d="M74 292 L123.1 292.2 L172 292.1 L221 291.8 L270.1 291.9 L318.9 291.9 L368.1 291.8 L417.1 292 L466 292" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<path d="M74 314 L123.1 313.7 L171.9 313.7 L221 313.9 L269.8 314 L319 313.9 L368 314.4 L416.9 314.3 L466 314" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<path d="M74 336 L122.9 336.2 L171.9 336.4 L221 336.4 L269.9 335.9 L319.1 335.7 L367.9 336.1 L417.1 335.9 L466 336" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<path d="M74 358 L122.9 357.9 L172.2 357.7 L221 357.9 L270 357.8 L319 358.3 L368.1 358.1 L417 358.1 L466 358" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<path d="M74 380 L122.9 380.3 L172.1 380 L221.1 379.9 L270 379.8 L319 380.1 L368 379.6 L417 380 L466 380" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<path d="M74 402 L123 402.1 L172.1 401.7 L221 402.4 L270.1 401.9 L319.1 402.4 L368 402.3 L416.9 402.4 L466 402" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<path d="M74 424 L123 423.8 L172.1 424.1 L221.1 424.3 L270.1 424 L319.2 423.7 L368.1 424.2 L416.9 424.2 L466 424" stroke="var(--ink)" stroke-width=".4" opacity=".18"/>
+<rect x="100" y="258" width="54" height="42" rx="1.5" fill="url(#h-ink-dense)" stroke="var(--ink)" stroke-width="1.1" opacity=".85"/>
+<rect x="192" y="258" width="54" height="42" rx="1.5" fill="url(#h-ink-dense)" stroke="var(--ink)" stroke-width="1.1" opacity=".85"/>
+<g class="win win-m">
+<rect x="284" y="258" width="54" height="42" rx="1.5" fill="var(--rust)" opacity=".16" class="win-light"/>
+<rect x="284" y="258" width="54" height="42" rx="1.5" fill="url(#h-rust)" class="win-light" opacity=".55"/>
+<circle cx="311" cy="275" r="5.2" fill="var(--ink)"/>
+<path d="M299 300 C 300 285, 322 285, 323 300 Z" fill="var(--ink)"/>
+<rect x="284" y="258" width="54" height="42" rx="1.5" stroke="var(--ink)" stroke-width="1.3"/>
+<path d="M311 258V300" stroke="var(--ink)" stroke-width=".6" opacity=".5"/>
+<text x="311" y="314" text-anchor="middle" class="win-label">m</text>
+</g>
+<rect x="376" y="258" width="54" height="42" rx="1.5" fill="url(#h-ink-dense)" stroke="var(--ink)" stroke-width="1.1" opacity=".85"/>
+<g class="win win-a">
+<rect x="100" y="320" width="54" height="42" rx="1.5" fill="var(--rust)" opacity=".16" class="win-light"/>
+<rect x="100" y="320" width="54" height="42" rx="1.5" fill="url(#h-rust)" class="win-light" opacity=".55"/>
+<circle cx="127" cy="337" r="5.2" fill="var(--ink)"/>
+<path d="M115 362 C 116 347, 138 347, 139 362 Z" fill="var(--ink)"/>
+<rect x="100" y="320" width="54" height="42" rx="1.5" stroke="var(--ink)" stroke-width="1.3"/>
+<path d="M127 320V362" stroke="var(--ink)" stroke-width=".6" opacity=".5"/>
+<text x="127" y="376" text-anchor="middle" class="win-label">a</text>
+</g>
+<rect x="192" y="320" width="54" height="42" rx="1.5" fill="url(#h-ink-dense)" stroke="var(--ink)" stroke-width="1.1" opacity=".85"/>
+<rect x="284" y="320" width="54" height="42" rx="1.5" fill="url(#h-ink-dense)" stroke="var(--ink)" stroke-width="1.1" opacity=".85"/>
+<g class="win win-d">
+<rect x="376" y="320" width="54" height="42" rx="1.5" fill="var(--rust)" opacity=".16" class="win-light"/>
+<rect x="376" y="320" width="54" height="42" rx="1.5" fill="url(#h-rust)" class="win-light" opacity=".55"/>
+<circle cx="403" cy="337" r="5.2" fill="var(--ink)"/>
+<path d="M391 362 C 392 347, 414 347, 415 362 Z" fill="var(--ink)"/>
+<rect x="376" y="320" width="54" height="42" rx="1.5" stroke="var(--ink)" stroke-width="1.3"/>
+<path d="M403 320V362" stroke="var(--ink)" stroke-width=".6" opacity=".5"/>
+<text x="403" y="376" text-anchor="middle" class="win-label">d</text>
+</g>
+<rect x="100" y="382" width="54" height="42" rx="1.5" fill="url(#h-ink-dense)" stroke="var(--ink)" stroke-width="1.1" opacity=".85"/>
+<rect x="192" y="382" width="54" height="42" rx="1.5" fill="url(#h-ink-dense)" stroke="var(--ink)" stroke-width="1.1" opacity=".85"/>
+<rect x="284" y="382" width="54" height="42" rx="1.5" fill="url(#h-ink-dense)" stroke="var(--ink)" stroke-width="1.1" opacity=".85"/>
+<g class="win win-j">
+<rect x="376" y="382" width="54" height="42" rx="1.5" fill="var(--rust)" opacity=".16" class="win-light"/>
+<rect x="376" y="382" width="54" height="42" rx="1.5" fill="url(#h-rust)" class="win-light" opacity=".55"/>
+<circle cx="403" cy="399" r="5.2" fill="var(--ink)"/>
+<path d="M391 424 C 392 409, 414 409, 415 424 Z" fill="var(--ink)"/>
+<rect x="376" y="382" width="54" height="42" rx="1.5" stroke="var(--ink)" stroke-width="1.3"/>
+<path d="M403 382V424" stroke="var(--ink)" stroke-width=".6" opacity=".5"/>
+<text x="403" y="438" text-anchor="middle" class="win-label">j</text>
+</g>
+<rect x="248" y="396" width="44" height="44" fill="url(#h-ink)" stroke="var(--ink)" stroke-width="1.2"/>
+</g>
+<g class="studio">
+<ellipse cx="940" cy="446" rx="120" ry="16" fill="url(#h-rust)" opacity=".5" class="spill"/>
+<path d="M800 254 L940 176 L1080 254 Z" fill="url(#h-ink)" stroke="var(--ink)" stroke-width="1.4"/>
+<rect x="812" y="254" width="256" height="186" fill="var(--card)" stroke="var(--ink)" stroke-width="1.4"/>
+<path d="M1068 254 L1092 266 V440 H1068 Z" fill="url(#h-ink)" stroke="var(--ink)" stroke-width="1.1"/>
+<path d="M816 268 L847 268 L878.1 267.8 L908.9 268.1 L939.9 268 L971.1 268 L1001.9 268.2 L1033.1 268.2 L1064 268" stroke="var(--ink)" stroke-width=".4" opacity=".16"/>
+<path d="M816 292 L847 292.3 L878.1 291.7 L909 291.7 L939.9 291.9 L971.1 292.3 L1001.9 291.7 L1033 292.3 L1064 292" stroke="var(--ink)" stroke-width=".4" opacity=".16"/>
+<path d="M816 316 L847 316.3 L877.9 316.4 L908.9 316.1 L940.1 316.2 L970.9 316.1 L1002 315.6 L1032.9 315.9 L1064 316" stroke="var(--ink)" stroke-width=".4" opacity=".16"/>
+<path d="M816 340 L847 339.8 L878 340.2 L908.9 339.7 L940.1 340 L970.9 339.7 L1002.1 340.1 L1033 339.8 L1064 340" stroke="var(--ink)" stroke-width=".4" opacity=".16"/>
+<path d="M816 364 L847.2 364.2 L878.1 363.9 L908.9 363.9 L939.9 364.1 L971 364.3 L1002 364 L1033 364.4 L1064 364" stroke="var(--ink)" stroke-width=".4" opacity=".16"/>
+<path d="M816 388 L847 388.2 L877.9 388.1 L908.9 388.3 L939.9 388.3 L971.1 388 L1002.1 387.9 L1033.1 388.1 L1064 388" stroke="var(--ink)" stroke-width=".4" opacity=".16"/>
+<path d="M816 412 L847 411.7 L878 411.8 L909 412.4 L939.9 412.2 L971.1 411.8 L1002 411.7 L1033.1 411.8 L1064 412" stroke="var(--ink)" stroke-width=".4" opacity=".16"/>
+<rect x="898" y="270" width="84" height="26" rx="2" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.1"/>
+<text x="940" y="287" text-anchor="middle" class="sign">studio</text>
+<circle cx="940" cy="384" r="70" fill="url(#glow)" class="door-glow"/>
+<path d="M906 440 V382 A34 34 0 0 1 974 382 V440 Z" fill="var(--rust)" class="door"/>
+<path d="M906 440 V382 A34 34 0 0 1 974 382 V440" stroke="var(--ink)" stroke-width="1.4"/>
+<path d="M940 348 V440" stroke="var(--paper)" stroke-width="1" opacity=".55"/>
+<rect x="836" y="318" width="38" height="46" rx="1.5" fill="url(#h-rust)" opacity=".7" class="side-win"/>
+<rect x="836" y="318" width="38" height="46" rx="1.5" stroke="var(--ink)" stroke-width="1.1"/>
+<rect x="1006" y="318" width="38" height="46" rx="1.5" fill="url(#h-rust)" opacity=".7" class="side-win"/>
+<rect x="1006" y="318" width="38" height="46" rx="1.5" stroke="var(--ink)" stroke-width="1.1"/>
+</g>
+<rect x="0" y="440" width="1200" height="80" fill="url(#h-ground)" opacity=".55"/>
+<path d="M0 440 L39.9 439.7 L80.2 440.6 L120.1 440.1 L159.7 440.6 L199.7 439.8 L239.9 440.4 L280.1 439.8 L320.3 440.7 L359.7 440.2 L400 439.8 L440 439.7 L480.1 440.2 L520.3 440.8 L560.3 439.8 L600.2 440.2 L640.1 440.8 L679.7 439.9 L719.9 440.2 L759.8 440.8 L799.8 439.8 L839.8 439.8 L880.2 439.3 L919.8 440.2 L960.1 440.4 L999.8 440.5 L1040.1 440.4 L1079.8 439.9 L1119.7 440.6 L1160.3 440.6 L1200 440" stroke="var(--ink)" stroke-width="1.6"/>
+<g stroke="var(--ink)" stroke-width=".9" stroke-linecap="round" opacity=".7">
+<path d="M38.5 470.4 l0.1 -6.7 M41.5 470.4 l-0.6 -5.3"/>
+<path d="M941.3 467.5 l-1.5 -6.5 M944.3 467.5 l1.3 -5.2"/>
+<path d="M163.1 455.1 l-0.8 -6.6 M166.1 455.1 l2.1 -5.2"/>
+<path d="M301.2 474 l-1.1 -4.3 M304.2 474 l0.8 -3.4"/>
+<path d="M668.6 476.6 l-1.6 -8.3 M671.6 476.6 l2.4 -6.6"/>
+<path d="M192.7 506.3 l-0.4 -6.6 M195.7 506.3 l1.4 -5.3"/>
+<path d="M1029.3 505.9 l-2 -6.1 M1032.3 505.9 l-0.4 -4.9"/>
+<path d="M975.8 492.6 l-1.4 -7.6 M978.8 492.6 l1.1 -6.1"/>
+<path d="M43.7 456.4 l1.9 -5.5 M46.7 456.4 l1.6 -4.4"/>
+<path d="M1010.3 452.7 l-1.7 -6.1 M1013.3 452.7 l0 -4.9"/>
+<path d="M141.9 503.3 l-0 -5.6 M144.9 503.3 l1.6 -4.5"/>
+<path d="M1056.3 504.9 l0 -6.8 M1059.3 504.9 l2.6 -5.5"/>
+<path d="M475.4 467.4 l-1 -7.7 M478.4 467.4 l0.5 -6.2"/>
+<path d="M516.5 477.7 l-0.3 -5.8 M519.5 477.7 l0.8 -4.6"/>
+<path d="M68.5 498.5 l0.1 -4.3 M71.5 498.5 l1.2 -3.4"/>
+<path d="M481.7 462.9 l-0.5 -4.5 M484.7 462.9 l0.3 -3.6"/>
+<path d="M581.1 463.4 l-0.1 -7.7 M584.1 463.4 l-1 -6.2"/>
+<path d="M489.8 506 l0.4 -4 M492.8 506 l2.8 -3.2"/>
+<path d="M441.5 484.7 l-0.8 -5.8 M444.5 484.7 l1.4 -4.7"/>
+<path d="M705.5 468.3 l0.1 -6.5 M708.5 468.3 l2 -5.2"/>
+<path d="M72.6 455.4 l-0.9 -5.3 M75.6 455.4 l2.2 -4.2"/>
+<path d="M512.1 499.9 l-0.9 -6 M515.1 499.9 l1.7 -4.8"/>
+<path d="M110.8 507.1 l-0.7 -8.2 M113.8 507.1 l0.3 -6.5"/>
+<path d="M976.8 495.7 l-1.8 -7.2 M979.8 495.7 l2.1 -5.8"/>
+<path d="M66.6 486.2 l1.7 -6.8 M69.6 486.2 l1.6 -5.4"/>
+<path d="M36.4 504.2 l0.3 -7.8 M39.4 504.2 l-1 -6.2"/>
+<path d="M879.6 474.3 l1.9 -7.4 M882.6 474.3 l2.7 -5.9"/>
+<path d="M98.4 495.3 l1 -6.2 M101.4 495.3 l0.5 -5"/>
+<path d="M538.3 475.3 l-0.7 -4.6 M541.3 475.3 l1.9 -3.7"/>
+<path d="M94.3 456.7 l0.7 -8.2 M97.3 456.7 l1.2 -6.5"/>
+<path d="M143.6 456.9 l1.8 -5.6 M146.6 456.9 l1.2 -4.4"/>
+<path d="M1098.3 462.2 l0.1 -6.1 M1101.3 462.2 l2.4 -4.9"/>
+<path d="M155.6 500.7 l-1.9 -6.4 M158.6 500.7 l0.7 -5.1"/>
+<path d="M455.5 489.1 l-0 -8.6 M458.5 489.1 l1.8 -6.9"/>
+<path d="M467.8 495.2 l1 -4.5 M470.8 495.2 l-0.3 -3.6"/>
+<path d="M701.3 461.7 l-1.3 -5.7 M704.3 461.7 l0.4 -4.6"/>
+<path d="M707.9 480.2 l0.3 -5.9 M710.9 480.2 l2.4 -4.8"/>
+<path d="M432.8 483.9 l1.9 -6.4 M435.8 483.9 l0.3 -5.1"/>
+<path d="M833 463.5 l0.9 -5.3 M836 463.5 l1.3 -4.2"/>
+<path d="M313.3 453.7 l-0.5 -8.1 M316.3 453.7 l1.9 -6.5"/>
+</g>
+<g class="threads" stroke-linecap="round">
+<path class="thread thread-a" pathLength="1" d="M127 323 C 167 91, 640 60, 940 326" stroke="var(--rust)" stroke-width="1.6"/>
+<path class="thread thread-m" pathLength="1" d="M311 261 C 371 99, 820 150, 940 326" stroke="var(--rust)" stroke-width="1.6"/>
+<path class="thread thread-d" pathLength="1" d="M413 323 C 493 181, 760 210, 940 326" stroke="var(--rust)" stroke-width="1.6"/>
+<path class="thread thread-j" pathLength="1" d="M423 385 C 493 253, 633 283, 599 357 S 690 330, 940 326" stroke="var(--rust)" stroke-width="1.6"/>
+</g>
+<g class="spark"><circle cx="940" cy="326" r="20" fill="url(#glow)"/><path d="M944 326L955 326M942.8 328.8L946.4 332.4M940 330L940 341M937.2 328.8L933.6 332.4M936 326L925 326M937.2 323.2L933.6 319.6M940 322L940 311M942.8 323.2L946.4 319.6" stroke="var(--rust)" stroke-width="2" stroke-linecap="round"/><circle cx="940" cy="326" r="2.6" fill="var(--rust)"/></g>
+</g>
+</svg>
+    <div class="note note-a"><span class="micro">a / just you &amp; your agent</span><p>“$40 + an uber is a lot. under $10, home by 11. only if 2 others feel the same.”</p><span class="micro note-foot">private terms <span aria-hidden="true">↗</span></span></div>
+    <div class="note note-m"><span class="micro">m / her private terms</span><p>“can’t do $40 this week. anything under $15.”</p><span class="micro note-foot">stays with her agent <span aria-hidden="true">↗</span></span></div>
+  </figure>
+  <div class="token" aria-hidden="true"><span class="token-star">✳</span><span class="micro">new version</span><strong>“all of you are down”</strong><span class="micro">no names · no reasons</span></div>
+  <p class="scene-caption micro wrap">illustrative scene · all people and events on this site are synthetic</p>
+
+  <div class="wrap strip micro" aria-hidden="true">
+    <span>private terms</span><span class="strip-sep">✳</span><span>versions, not vetoes</span><span class="strip-sep">✳</span><span>private asks</span><span class="strip-sep">✳</span><span>no names</span><span class="strip-sep">✳</span><span>devhacks s3 · team southside</span>
+  </div>
+</section>
+
+<section class="problem wrap section" aria-labelledby="problem-title">
+  <div data-reveal>
+    <p class="eyebrow">01 / the abilene problem</p>
+    <h2 id="problem-title">everyone’s going.<br><em>nobody wants to.</em></h2>
+  </div>
+  <div class="problem-copy" data-reveal>
+    <p>The club night got planned in the group chat. Three of you would change something about it: the price, the time, the whole thing. Each of you assumes you’re the only one, so everyone goes, spends $40 and leaves early. Or someone quietly bails.</p>
+    <p class="strong">Down? finds the version of the plan the whole group can actually do, without anyone having to say why.</p>
+    <p class="scribble" aria-label="sounds fun lol. typed by everyone, meant by no one."><s>“sounds fun lol”</s><span class="micro">typed by everyone.<br>meant by no one.</span></p>
+  </div>
+  <div class="research" data-reveal>
+    <p class="micro list-title">why this happens, and why it’s fixable</p>
+    <div class="research-grid">
+      <article><strong>pluralistic ignorance</strong><p>Students privately felt less comfortable with campus drinking than they thought their peers did. Showing them the real private norm changed what they did.</p><span class="micro">prentice &amp; miller 1993 · schroeder &amp; prentice 1998</span></article>
+      <article><strong>the abilene paradox</strong><p>A group drives 53 miles in the heat for a dinner nobody wanted, because each person assumed the others did.</p><span class="micro">harvey 1974 · a parable, not a study</span></article>
+      <article><strong>money is the quiet reason</strong><p>44% of young adults have skipped a major social event over cost. Saying “i can’t afford it” out loud is the hard part.</p><span class="micro">ally bank survey 2025</span></article>
+      <article><strong>the fear is mostly imagined</strong><p>People overestimate how upset friends get when they decline. Thresholds (“I’ll act if two others do”) are how groups tip.</p><span class="micro">givi &amp; kirk 2024 · granovetter 1978</span></article>
+    </div>
+  </div>
+</section>
+
+<section class="how section" id="how" aria-labelledby="how-title">
+  <div class="wrap section-head" data-reveal>
+    <p class="eyebrow">02 / versions, not vetoes</p>
+    <h2 id="how-title">your agent negotiates with theirs.<br><em>nobody has to go first.</em></h2>
+    <p class="section-sub">Four friends, one $40 plan, three versions the agents can try. Scroll to watch them work it out.</p>
+  </div>
+
+  <div class="wrap scrolly">
+    <div class="stage" data-step="1" aria-hidden="true">
+      <div class="stage-session">
+        <span class="micro session-label"><span class="s-1">the group’s plan</span><span class="s-2">version 1</span><span class="s-3">a private ask</span><span class="s-4">everyone, privately</span><span class="s-5">the group hears</span></span>
+        <strong class="session-when"><span class="s-1">club night · $40</span><span class="s-2">same club, early · $12</span><span class="s-3">“$12 instead of $10?”</span><span class="s-4">would you switch?</span><span class="s-5">“all of you are down”</span></strong>
+        <span class="micro session-meta"><span class="s-1">fri · 10 pm–1 am · downtown</span><span class="s-2">fri · 8:30–10:30 pm</span><span class="s-3">only alex sees this</span><span class="s-4">same words for everyone</span><span class="s-5">no names · no reasons</span></span>
+      </div>
+      <svg class="stage-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path class="ln ln-a" d="M22 24 L50 50"/><path class="ln ln-m" d="M78 24 L50 50"/>
+        <path class="ln ln-j" d="M22 76 L50 50"/><path class="ln ln-d" d="M78 76 L50 50"/>
+      </svg>
+      <div class="agent agent-a"><span class="avatar">a</span><div><strong>alex</strong><p>“$40 + an uber is a lot. under $10, home by 11. only if 2 others feel the same.”</p></div><span class="verdict v-2 maybe">close</span><span class="verdict v-3 yes">ok</span><span class="verdict v-4 yes">yes</span></div>
+      <div class="agent agent-m"><span class="avatar">m</span><div><strong>maya</strong><p>“can’t do $40 this week. anything under $15.”</p></div><span class="verdict v-2 yes">fits</span><span class="verdict v-3 quiet">—</span><span class="verdict v-4 yes">yes</span></div>
+      <div class="agent agent-j"><span class="avatar">j</span><div><strong>jay</strong><p>“honestly? i’m excited for the club. if it changes, keep it a club thing.”</p></div><span class="verdict v-2 yes">fits</span><span class="verdict v-3 quiet">—</span><span class="verdict v-4 yes">yes</span></div>
+      <div class="agent agent-d"><span class="avatar">d</span><div><strong>dev</strong><p>“i’d switch if anyone else does. early shift saturday, home by 11.”</p></div><span class="verdict v-2 yes">fits</span><span class="verdict v-3 quiet">—</span><span class="verdict v-4 yes">yes</span></div>
+      <p class="stage-key micro"><span class="lock" aria-hidden="true">⌁</span> each quote lives only inside that student’s agent</p>
+    </div>
+
+    <ol class="steps">
+      <li class="step" data-step="1"><span class="step-n">01</span><h3>say it privately.</h3><p>Each student tells only their own agent how they really feel. Alex, Maya and Dev would change the plan, each with their own limits. Jay’s happy with it. Alex adds a safety net: only if two others want a change too.</p><p class="micro">nothing is posted. nobody is pinged.</p></li>
+      <li class="step" data-step="2"><span class="step-n">02</span><h3>the agents try versions.</h3><p>Three of four want a change, which is enough for Alex’s safety net, so the agents try versions of the plan, best first. Same club, student early entry, 8:30 to 10:30, $12. That fits Jay’s “keep it a club thing”, Maya’s $15 and Dev’s 11 pm. It’s $2 over Alex’s cap.</p><p class="micro">each agent answers fits, close or no. nothing else.</p></li>
+      <li class="step" data-step="3"><span class="step-n">03</span><h3>one small ask, just for alex.</h3><p>Only Alex’s agent hears the version is close. It asks Alex privately: “works for your whole group if you can do $12 instead of $10. ok? nobody will know it was you.” If Alex says no, the limit stays firm and the agents try the next version.</p><p class="micro">nobody else learns an ask happened</p></li>
+      <li class="step" data-step="4"><span class="step-n">04</span><h3>everyone says yes, privately.</h3><p>Each of the four gets the same question: here’s a version all of you can do, would you switch? Jay hears exactly what Maya hears, so nobody can tell who asked for a change. A pass sends the agents to the next version, and nobody learns who passed.</p><p class="micro">a yes from everyone before anything is said</p></li>
+      <li class="step" data-step="5"><span class="step-n">05</span><h3>the group hears it. no names.</h3><p>“New version of the plan: all of you are down.” Same club, earlier, $28 cheaper, everyone home by 11. Nobody had to say “i can’t afford it” out loud.</p><p class="micro">nobody had to be the one who said it</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="try section" id="try" aria-labelledby="try-title">
+  <div class="wrap">
+    <div class="try-head" data-reveal>
+      <div>
+        <p class="eyebrow">03 / your turn</p>
+        <h2 id="try-title">okay, are you <em>not</em> down?</h2>
+      </div>
+      <p>Be Alex for a minute. Tell your agent how you really feel about the club night. Maya, Jay and Dev keep the terms you just read, and their agents answer by themselves.</p>
+    </div>
+    <p class="micro try-label"><span class="dot" aria-hidden="true"></span><span id="engine-label">same rules as the discord bot · fictional friends</span></p>
+
+    <div class="console">
+      <form class="panel terms" id="terms" aria-labelledby="terms-title">
+        <div class="panel-head"><span class="micro">alex’s private space</span><span class="avatar">a</span></div>
+        <h3 id="terms-title">the club night.<br>your honest take.</h3>
+
+        <div class="words" id="words" hidden>
+          <label class="field-label" for="say">say it like you’d text it</label>
+          <textarea id="say" rows="3" maxlength="280">ngl $40 + an uber is a lot. under $10, home by 11, only if 2 others feel the same</textarea>
+          <button class="pill ghost" type="button" id="read">let my agent read it <span aria-hidden="true">↗</span></button>
+          <p class="hint" id="read-note" aria-live="polite"></p>
+          <p class="micro or">or set it yourself</p>
+        </div>
+
+        <label class="toggle"><input type="checkbox" id="change" checked><span class="toggle-ui" aria-hidden="true"></span><span>honestly, i’d rather it change</span></label>
+
+        <label class="field-label" for="price">most i’d spend <output id="price-out" for="price">$10</output></label>
+        <input type="range" id="price" name="price" min="0" max="20" step="1" value="10">
+        <div class="range-ends micro" aria-hidden="true"><span>$0</span><span>$20</span></div>
+
+        <fieldset>
+          <legend>home by</legend>
+          <div class="seg seg-3">
+            <input type="radio" name="home" id="h-10" value="22:00"><label for="h-10">10 pm</label>
+            <input type="radio" name="home" id="h-11" value="23:00" checked><label for="h-11">11 pm</label>
+            <input type="radio" name="home" id="h-any" value=""><label for="h-any">no curfew</label>
+          </div>
+        </fieldset>
+
+        <fieldset id="others-set">
+          <legend>only if at least … others want a change too</legend>
+          <div class="seg seg-3">
+            <input type="radio" name="others" id="o-1" value="1"><label for="o-1">1</label>
+            <input type="radio" name="others" id="o-2" value="2" checked><label for="o-2">2</label>
+            <input type="radio" name="others" id="o-3" value="3"><label for="o-3">3</label>
+          </div>
+        </fieldset>
+
+        <p class="form-note">Your agent answers “fits”, “close” or “no” for each version. Never your words, your budget, your curfew or your threshold.</p>
+        <button class="pill" type="submit">tell my agent, privately <span aria-hidden="true">↗</span></button>
+        <button class="text-link reset" type="button" id="start-over">start over</button>
+      </form>
+
+      <div class="panel phone" aria-labelledby="phone-title">
+        <div class="panel-head"><span class="micro" id="phone-title">what alex sees</span><span class="micro" id="phase">nothing said yet</span></div>
+        <div id="view" class="view" aria-live="polite" aria-atomic="true"></div>
+      </div>
+
+      <div class="panel ledger" aria-labelledby="ledger-title">
+        <div class="panel-head"><span class="micro" id="ledger-title">between the agents</span><span class="micro tag">behind the scenes</span></div>
+        <p class="ledger-note">A view no student gets. Exactly what crossed between agents: one word per version, nothing else.</p>
+        <div id="ledger" class="ledger-body"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="live section wrap" id="live" aria-labelledby="live-title">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">04 / the real thing</p>
+    <h2 id="live-title">not a mockup.<br><em>dm your agent.</em></h2>
+    <p class="section-sub">The prototype runs for real on Discord, where groups already plan. The group’s plan comes from the server’s events. Each person messages their own agent, the agents negotiate on our server, and the group channel hears the new version.</p>
+  </div>
+  <div class="live-grid">
+    <article class="panel live-card" data-reveal>
+      <div class="panel-head"><span class="micro">on discord</span><span class="micro tag">two phones, one reveal</span></div>
+      <h3>message your own agent.</h3>
+      <ol class="live-steps">
+        <li><span class="micro">01</span>join the demo server</li>
+        <li><span class="micro">02</span>dm the down? bot</li>
+        <li><span class="micro">03</span>pick a demo student: alex, maya, jay or dev</li>
+        <li><span class="micro">04</span>tell it, privately, how you really feel about the plan</li>
+      </ol>
+      <a class="pill" id="discord-invite" href="https://discord.gg/f36rKZA5z" data-invite="https://discord.gg/f36rKZA5z">join the demo server <span aria-hidden="true">↗</span></a>
+      <p class="hint">bring friends: seats nobody picks are played by demo friends, so it works with one person or four.</p>
+    </article>
+    <article class="panel live-card" data-reveal>
+      <div class="panel-head"><span class="micro">plan context</span><span class="micro tag">no new app</span></div>
+      <h3>the plan is already in your server.</h3>
+      <p>Make a Discord event for the plan and put <b>#plan</b> in its description. Other events with a price (“$12”, “free”) are the versions the agents may try. No events? The bot uses the demo club night.</p>
+      <p class="hint">the agents only pick from versions someone in the group actually posted.</p>
+    </article>
+    <figure class="panel dm" data-reveal aria-label="Example of a Discord conversation between Alex and Alex's agent">
+      <div class="panel-head"><span class="micro">alex ↔ alex’s agent</span><span class="micro tag">real bot replies</span></div>
+      <div class="dm-thread">
+        <p class="bubble me">ngl $40 + an uber is a lot. under $10, home by 11, only if 2 others feel the same</p>
+        <p class="bubble bot"><b>kept between us.</b><br>• the plan: you’d rather it change<br>• you could do: anything · $10 max · home by 11 pm<br>• only if: at least 2 others want a change too<br>reply yes to lock it in.</p>
+        <p class="bubble me">yes</p>
+        <p class="bubble bot">✳ <b>one small ask, just for you</b><br>same club, student early entry · fri 8:30–10:30 pm · $12<br>it works for your whole group if you can do <b>$12 instead of $10</b>. ok? nobody will know it was you.</p>
+        <p class="bubble me">yes</p>
+        <p class="bubble bot">✳ <b>a version all of you can do</b><br>would you switch to it? nobody learns who wanted a change.</p>
+        <p class="bubble me">yes</p>
+        <p class="bubble bot">✳ <b>it's on.</b> you're in with: alex, maya, jay, dev.</p>
+      </div>
+      <figcaption class="micro">synthetic student · the prototype’s own wording, shortened</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="privacy section wrap" id="privacy" aria-labelledby="privacy-title">
+  <div class="privacy-art" data-reveal aria-hidden="true">
+    <svg viewBox="0 0 360 300" fill="none"><defs><pattern id="env-h" width="5" height="5" patternUnits="userSpaceOnUse"><path d="M0 5L5 0" stroke="var(--ink)" stroke-width=".5"/></pattern></defs><ellipse cx="170" cy="258" rx="132" ry="9" fill="url(#env-h)"/><g transform="rotate(-9 180 160)"><rect x="65" y="65" width="215" height="153" rx="8" fill="var(--card)" stroke="var(--ink)" stroke-width="1.8"/><path d="M68 69L172 149L277 69M68 215L137 138M277 215L208 138" stroke="var(--ink)" stroke-width="1.8"/><path d="M77 78L172 155L267 78M76 206L137 144M268 206L208 144" stroke="var(--ink)" stroke-width=".6"/><circle cx="174" cy="146" r="30" fill="var(--paper)" stroke="var(--rust)" stroke-width="1.4"/><rect x="162" y="143" width="24" height="20" rx="3" fill="url(#env-h)" stroke="var(--rust)" stroke-width="1.3"/><path d="M167 143V136A7 7 0 0 1 181 136V143" stroke="var(--rust)" stroke-width="1.8"/></g><path d="M290 51L307 33M300 69L326 65M271 36L273 14" stroke="var(--ink)"/></svg>
+    <span class="micro">some things can stay unsaid.</span>
+  </div>
+  <div data-reveal>
+    <p class="eyebrow">05 / privacy is the point</p>
+    <h2 id="privacy-title">not feeling it?<br><em>nobody has to know.</em></h2>
+    <div class="ledger-lists">
+      <div><p class="micro list-title">what leaves your agent</p><ul><li>whether you’d like a change, to the other agents only</li><li>one word per version: fits, close or no</li><li>your yes, once a version works for everyone</li></ul></div>
+      <div><p class="micro list-title">what never does</p><ul class="never"><li>your words</li><li>your budget, curfew or threshold</li><li>who asked for a change, who was asked to stretch, or who passed</li><li>an exact count</li></ul></div>
+    </div>
+    <details class="honest">
+      <summary>what we can honestly promise</summary>
+      <p>This is a prototype’s privacy model, not a security guarantee. The server that runs the agents sees their one-word answers. Nothing starts unless at least two people want a change, so a new version never points to one person, and everyone gets the same question. In a small group people can still guess; that’s the nature of any group decision. We never post names, counts or reasons.</p>
+    </details>
+  </div>
+</section>
+
+<section class="moments section wrap" aria-labelledby="moments-title">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">06 / more than one kind of not down</p>
+    <h2 id="moments-title">for every plan you’d quietly change.</h2>
+  </div>
+  <div class="moments-grid">
+    <article data-reveal>
+      <svg class="moment-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="9" y="14" width="30" height="22" rx="3" stroke="var(--ink)" stroke-width="1.5"/><path d="M9 20h30" stroke="var(--ink)" stroke-width="1.5"/><path d="M15 29h8" stroke="var(--rust)" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <h3>the spring break nobody can afford.</h3><p>“only if most of us want something cheaper.” the agents try the cheaper trip first.</p>
+    </article>
+    <article data-reveal>
+      <svg class="moment-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="15" stroke="var(--ink)" stroke-width="1.5"/><path d="M24 15v9l6 4" stroke="var(--rust)" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <h3>the party you’d leave at 11.</h3><p>“home by 11.” the version that starts earlier, so nobody leaves first.</p>
+    </article>
+    <article data-reveal>
+      <svg class="moment-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="15" cy="10" r="4" stroke="var(--rust)" stroke-width="1.5"/><circle cx="33" cy="10" r="4" stroke="var(--rust)" stroke-width="1.5"/><path d="M15 15v13l-5 12M15 28l5 12M33 15v13l-5 12M33 28l5 12M15 20l9 5 9-5" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>the group project meetup at 8 am.</h3><p>“not before 10.” same agents, same privacy, a later version.</p>
+    </article>
+  </div>
+</section>
+
+<section class="closing wrap" aria-labelledby="closing-title" data-reveal>
+  <p class="eyebrow">less going along.</p>
+  <h2 id="closing-title">more <em>“honestly, same.”</em></h2>
+  <a class="pill" href="#try">play it out <span aria-hidden="true">↗</span></a>
+</section>
+
+</main>
+
+<footer class="wrap footer">
+  <a class="brand" href="#top" aria-label="Down? home">down<span>?</span></a>
+  <div><p class="micro">team southside</p><p>Charith Kutikuppala &amp; Richitha Rekula</p></div>
+  <div class="footer-end"><p class="micro">devhacks s3 · cubbie hackathon · track 02</p><p>agent-to-agent coordination · working prototype</p></div>
+</footer>
+</body>
+</html>
