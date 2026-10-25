@@ -8,7 +8,7 @@ Groups on campus have empty seats: the pickup game that needs two more, the stud
 
 Built for the Cubbie Hackathon at DevHacks S3, Track 02 (agent-to-agent coordination), by Team Southside.
 
-**[Live site](https://down-kohl.vercel.app) · [Add Open Seat to your Discord server](https://discord.com/oauth2/authorize?client_id=1563729007642677338&scope=bot&permissions=68608) · [Our demo server](https://discord.gg/f36rKZA5z)**
+**[Live site](https://open-seat-asu.vercel.app) · [Add Open Seat to your Discord server](https://discord.com/oauth2/authorize?client_id=1563729007642677338&scope=bot&permissions=68608) · [Our demo server](https://discord.gg/f36rKZA5z)**
 
 ## How it works
 
