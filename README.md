@@ -1,6 +1,6 @@
 # Open Seat
 
-**Skip the awkward walk-up. Your agent rewrites the lobby, you just spawn in.**
+**Skip the awkward walk-up. Your agent saves you a seat.**
 
 Groups on campus have empty seats: the pickup game that needs two more, the study table with open chairs, a mutual friend's dinner. The people who'd fill them stay home, because walking in alone is the hard part. Open Seat gives every student a private agent. The agents pair up newcomers, reshape the plan so it fits everyone, and ping each person once: your seat is ready.
 
