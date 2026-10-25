@@ -1,212 +1,164 @@
-// Discord DMs as the messaging surface: each person DMs the bot and talks to their own agent.
+// Open Seat on Discord. Add the bot to any server. Groups mention it in a channel to post open
+// seats; anyone DMs it their terms, privately. Each person's DM thread is their own agent.
 // Runs inside the Next.js server process (see instrumentation.ts).
-import { ChannelType, Client, Events, GatewayIntentBits, Partials, type Guild, type Message, type TextChannel } from "discord.js";
-import { students } from "../demo/seed";
-import { getPlanRuntime } from "../server/plan-runtime";
-import { eventCard, HELP_TEXT, noteFor, planLine, respond, viewKey } from "./conversation";
-import { planFromEvents } from "./discord-plan";
+import { ChannelType, Client, Events, GatewayIntentBits, Partials, type Message, type TextChannel } from "discord.js";
+import { RequestLanguage } from "../agents/language";
+import { isDemo } from "../seat/demo";
+import { Hub } from "../seat/hub";
+import { campusNow } from "../seat/post";
+import { clock } from "../seat/runtime";
+import { handlePost, noteFor, respondDM, viewKey } from "./conversation";
 
 type Bridge = {
   client: Client;
-  links: Map<string, string>; // discord user id -> demo seat
-  lastKey: Map<string, string>; // demo seat -> last view key we reacted to
+  hub: Hub;
+  /** Real people we've talked to, so we can message them when something changes. */
+  users: Set<string>;
+  /** `${user}:${group}` -> the last view we reacted to. */
+  lastKey: Map<string, string>;
   queues: Map<string, Promise<void>>;
-  announced: string | null; // the announcement already posted to the group channel
+  announced: Set<string>;
+  guildCache: Map<string, { at: number; ids: string[] }>;
 };
 
-const store = globalThis as unknown as { downDiscord?: Bridge };
+const store = globalThis as unknown as { openSeatDiscord?: Bridge; openSeatHub?: Hub };
+export const getHub = () => (store.openSeatHub ??= new Hub());
 
-const NAMES = new Map(students.map((s) => [s.name.toLowerCase(), s.id]));
-const CLAIM = /^(?:i'?m |im |i am |join |as )?(alex|maya|jay|dev)\b/i;
-const LEAVE = /^(leave|switch|unlink|reset me)\b/i;
-// Demo retakes: a fresh round for everyone, seats stay claimed.
-const RESET = /^reset demo$/i;
-
-function owner(bridge: Bridge, seat: string) {
-  for (const [user, id] of bridge.links) if (id === seat) return user;
-  return null;
-}
-
-function freeNames(bridge: Bridge) {
-  return students.filter((s) => !owner(bridge, s.id)).map((s) => s.name.toLowerCase());
-}
+const language = () => new RequestLanguage();
 
 async function send(bridge: Bridge, userId: string, lines: string[]) {
-  if (!lines.length) return;
+  if (!lines.length || isDemo(userId)) return;
   const user = await bridge.client.users.fetch(userId);
   for (const line of lines) await user.send(line);
 }
 
-/** Serialize work per person so two quick DMs never race each other. */
+/** Serialize work per person so two quick messages never race each other. */
 function enqueue(bridge: Bridge, key: string, job: () => Promise<void>) {
   const next = (bridge.queues.get(key) ?? Promise.resolve()).then(job).catch((error) => {
-    console.error("[down/discord]", error);
+    console.error("[open-seat/discord]", error);
   });
   bridge.queues.set(key, next);
   return next;
 }
 
-async function onMessage(bridge: Bridge, msg: Message) {
-  if (msg.author.bot || msg.channel.type !== ChannelType.DM) return;
+/** The servers this person shares with the bot (cached for a few minutes). */
+async function sharedGuilds(bridge: Bridge, userId: string): Promise<string[]> {
+  const hit = bridge.guildCache.get(userId);
+  if (hit && Date.now() - hit.at < 5 * 60_000) return hit.ids;
+  const ids: string[] = [];
+  for (const guild of bridge.client.guilds.cache.values()) {
+    const member = await guild.members.fetch(userId).catch(() => null);
+    if (member) ids.push(guild.id);
+  }
+  bridge.guildCache.set(userId, { at: Date.now(), ids });
+  return ids;
+}
+
+function remember(bridge: Bridge, userId: string) {
+  bridge.users.add(userId);
+  for (const { record, view } of bridge.hub.views(userId)) bridge.lastKey.set(`${userId}:${record.group.id}`, viewKey([{ record, view }]));
+}
+
+async function onDM(bridge: Bridge, msg: Message) {
   const userId = msg.author.id;
-  const text = msg.content.trim();
   await enqueue(bridge, userId, async () => {
-    const rt = getPlanRuntime();
-    const seat = bridge.links.get(userId);
-    if (!seat) {
-      const claim = text.match(CLAIM)?.[1]?.toLowerCase();
-      const id = claim ? NAMES.get(claim) : undefined;
-      if (!id) {
-        const free = freeNames(bridge);
-        await send(bridge, userId, [free.length
-          ? `hey! this is a demo friend group of four. who are you today?\nreply ${free.map((n) => `**${n}**`).join(", ")}. anyone you don't pick is played by a demo friend.`
-          : "all four seats are taken right now. try again later."]);
-        return;
-      }
-      if (owner(bridge, id)) {
-        await send(bridge, userId, [`${claim} is taken. free: ${freeNames(bridge).join(", ") || "none"}.`]);
-        return;
-      }
-      bridge.links.set(userId, id);
-      rt.claim(id);
-      bridge.lastKey.set(id, viewKey(rt.view(id)));
-      await send(bridge, userId, [
-        `**hey ${claim}.** i'm your agent. only i see what you tell me here.`,
-        HELP_TEXT,
-        `**your group's plan:** ${planLine(rt.view(id))}\neveryone said yes. how do you really feel about it?`,
-      ]);
-      return;
-    }
-    if (RESET.test(text)) {
-      rt.reset();
-      bridge.announced = null;
-      for (const id of bridge.links.values()) bridge.lastKey.set(id, viewKey(rt.view(id)));
-      await send(bridge, userId, [`**fresh start.** everyone's terms are cleared; seats stay as they are.
-**your group's plan:** ${planLine(rt.view(seat))}
-how do you really feel about it?`]);
-      return;
-    }
-    if (LEAVE.test(text)) {
-      bridge.links.delete(userId);
-      rt.release(seat);
-      await send(bridge, userId, ["unlinked. reply a name to pick a seat again."]);
-      return;
-    }
+    const hub = bridge.hub;
+    hub.setName(userId, msg.author.displayName ?? msg.author.username);
+    const now = campusNow();
+    hub.sweep(now);
     if ("sendTyping" in msg.channel) await msg.channel.sendTyping().catch(() => {});
-    const replies = await respond(rt, seat, text);
-    // Replies already include news from the student's own action; don't send it twice.
-    bridge.lastKey.set(seat, viewKey(rt.view(seat)));
+    const guilds = await sharedGuilds(bridge, userId);
+    const replies = await respondDM(hub, { userId, guilds, now, parse: (t, a, n) => language().parseSeeker(t, a, n) }, msg.content);
+    // Replies already include news from the person's own message; don't send it twice.
+    remember(bridge, userId);
     await send(bridge, userId, replies);
   });
 }
 
-/** The group channel: DISCORD_GROUP_CHANNEL_ID, else #plans, else #general, else the first text channel. */
-async function groupChannel(client: Client): Promise<TextChannel | null> {
-  const wanted = process.env.DISCORD_GROUP_CHANNEL_ID;
-  if (wanted) {
-    const ch = await client.channels.fetch(wanted).catch(() => null);
-    return ch && ch.type === ChannelType.GuildText ? (ch as TextChannel) : null;
-  }
-  for (const guild of (await client.guilds.fetch()).values()) {
-    const full = await guild.fetch();
-    const channels = [...(await full.channels.fetch()).values()].filter((c): c is TextChannel => !!c && c.type === ChannelType.GuildText);
-    const pick = channels.find((c) => c.name === "plans") ?? channels.find((c) => c.name === "general") ?? channels[0];
-    if (pick) return pick;
-  }
-  return null;
+async function onMention(bridge: Bridge, msg: Message) {
+  const bot = bridge.client.user!;
+  await enqueue(bridge, `channel:${msg.channelId}`, async () => {
+    const hub = bridge.hub;
+    const others = [...msg.mentions.users.values()].filter((u) => u.id !== bot.id && u.id !== msg.author.id && !u.bot);
+    // Mentions arrive as <@id>; the reader sees names instead.
+    let text = msg.content.replace(new RegExp(`<@!?${bot.id}>`, "g"), "").trim();
+    for (const u of others) text = text.replace(new RegExp(`<@!?${u.id}>`, "g"), `@${u.displayName ?? u.username}`);
+    const now = campusNow();
+    hub.sweep(now);
+    const reply = await handlePost(hub, {
+      authorId: msg.author.id,
+      authorName: msg.member?.displayName ?? msg.author.displayName ?? msg.author.username,
+      guildId: msg.guildId!,
+      channelId: msg.channelId,
+      mentions: others.map((u) => ({ id: u.id, name: u.displayName ?? u.username })),
+      now,
+      parse: (t, n) => language().parseGroup(t, n),
+    }, text);
+    bridge.users.add(msg.author.id);
+    for (const u of others) bridge.users.add(u.id);
+    await msg.reply(reply);
+  });
 }
 
-/** Once a version is announced, the group hears it in its channel. No names, no counts, no reasons. */
-async function announceToGroup(bridge: Bridge) {
-  const rt = getPlanRuntime();
-  const a = rt.board.announcement();
-  if (!a) return;
-  const key = `${rt.board.plan.id}:${a.option.id}:${a.size}`;
-  if (bridge.announced === key) return;
-  bridge.announced = key;
-  const channel = await groupChannel(bridge.client);
-  if (!channel) {
-    console.error("[down/discord] no text channel to post the new version in");
-    return;
+/** Once everyone confirms, the group's channel hears it. Names went only to the people in the game. */
+async function announce(bridge: Bridge) {
+  for (const record of bridge.hub.groups.values()) {
+    const a = record.board.announcement();
+    if (!a || bridge.announced.has(record.group.id)) continue;
+    bridge.announced.add(record.group.id);
+    const channel = await bridge.client.channels.fetch(record.channelId).catch(() => null);
+    if (!channel || channel.type !== ChannelType.GuildText) continue;
+    const g = record.group;
+    await (channel as TextChannel).send(`✳ **open seat filled**\n${g.title} at ${g.place}: ${g.now} → **${a.version.label}** from ${clock(a.version.start)}.\n${a.newcomers} newcomer${a.newcomers === 1 ? "" : "s"} joined${a.rotation ? `, with a rotation at ${clock(a.rotation.at)}` : ""}. nobody had to walk up and ask.`);
   }
-  const plan = planLine(rt.view(rt.board.plan.memberIds[0]));
-  const bot = bridge.client.user?.username ?? "down?";
-  await channel.send(a.everyone
-    ? `✳ **new version of the plan: all of you are down**\ninstead of ${plan}:\n${eventCard(a.option)}\neveryone said yes privately. nobody had to go first, and nobody's limits were shared.`
-    : `✳ **${a.words} are doing something else this time**\ninstead of ${plan}:\n${eventCard(a.option)}\nthe original plan still stands for anyone who wants it. DM **@${bot}** and say **in** to join.`);
 }
 
-/** When the plan changes, each linked student's agent tells them what's new for them. */
+/** When anything changes, each person's agent tells them what's new for them, once. */
 function notifyAll(bridge: Bridge) {
-  const rt = getPlanRuntime();
-  void enqueue(bridge, "group-channel", () => announceToGroup(bridge));
-  for (const [userId, seat] of bridge.links) {
+  void enqueue(bridge, "announcements", () => announce(bridge));
+  for (const userId of bridge.users) {
     void enqueue(bridge, userId, async () => {
-      const view = rt.view(seat);
-      const key = viewKey(view);
-      if (bridge.lastKey.get(seat) === key) return;
-      bridge.lastKey.set(seat, key);
-      const note = noteFor(view);
-      if (note) await send(bridge, userId, [note]);
+      for (const { record, view } of bridge.hub.views(userId)) {
+        const k = `${userId}:${record.group.id}`;
+        const key = viewKey([{ record, view }]);
+        if (bridge.lastKey.get(k) === key) continue;
+        bridge.lastKey.set(k, key);
+        const note = noteFor(view);
+        if (note) await send(bridge, userId, [note]);
+      }
     });
   }
-}
-
-/** Read the group's plan from the server's scheduled events, if there are any. */
-async function loadPlan(guild: Guild) {
-  const events = await guild.scheduledEvents.fetch().catch((error) => {
-    console.error("[down/discord] couldn't read server events:", error.message);
-    return null;
-  });
-  if (!events) return;
-  const found = planFromEvents([...events.values()].map((e) => ({
-    id: e.id,
-    name: e.name,
-    description: e.description,
-    start: e.scheduledStartAt ?? new Date(),
-    end: e.scheduledEndAt,
-    location: e.entityMetadata?.location ?? null,
-  })));
-  if (!found) {
-    console.log("[down/discord] no server events; using the demo plan.");
-    return;
-  }
-  if (!found.versions.length) {
-    console.log(`[down/discord] plan "${found.plan.title}" has no priced versions to try (skipped: ${found.skipped.join(", ") || "none"}); using the demo plan.`);
-    return;
-  }
-  getPlanRuntime().usePlan(found.plan, found.versions);
-  console.log(`[down/discord] plan from server events: "${found.plan.title}" with ${found.versions.length} versions${found.skipped.length ? `; skipped (no price): ${found.skipped.join(", ")}` : ""}.`);
 }
 
 export function startDiscord() {
   const token = process.env.DISCORD_BOT_TOKEN;
   if (!token) {
-    console.log("[down/discord] DISCORD_BOT_TOKEN not set; Discord bridge is off.");
+    console.log("[open-seat/discord] DISCORD_BOT_TOKEN not set; Discord bridge is off.");
     return;
   }
-  if (store.downDiscord) return; // already running (dev reloads)
+  if (store.openSeatDiscord) return; // already running (dev reloads)
   const client = new Client({
-    intents: [GatewayIntentBits.DirectMessages, GatewayIntentBits.Guilds, GatewayIntentBits.GuildScheduledEvents],
+    // Message content arrives for DMs and for messages that mention the bot, without the privileged intent.
+    intents: [GatewayIntentBits.DirectMessages, GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
     partials: [Partials.Channel], // DM channels arrive uncached
   });
-  const bridge: Bridge = { client, links: new Map(), lastKey: new Map(), queues: new Map(), announced: null };
-  store.downDiscord = bridge;
+  const bridge: Bridge = { client, hub: getHub(), users: new Set(), lastKey: new Map(), queues: new Map(), announced: new Set(), guildCache: new Map() };
+  store.openSeatDiscord = bridge;
 
   let pending: ReturnType<typeof setTimeout> | null = null;
-  getPlanRuntime().subscribe(() => {
+  bridge.hub.subscribe(() => {
     if (pending) return;
     pending = setTimeout(() => { pending = null; notifyAll(bridge); }, 150);
   });
 
-  client.on(Events.MessageCreate, (msg) => void onMessage(bridge, msg));
-  client.once(Events.ClientReady, async (c) => {
-    console.log(`[down/discord] ready as ${c.user.tag}. DM the bot to start.`);
-    const guild = (await c.guilds.fetch()).first();
-    if (guild) await loadPlan(await guild.fetch());
+  client.on(Events.MessageCreate, (msg) => {
+    if (msg.author.bot) return;
+    if (msg.channel.type === ChannelType.DM) void onDM(bridge, msg);
+    else if (client.user && msg.mentions.users.has(client.user.id)) void onMention(bridge, msg);
   });
+  client.once(Events.ClientReady, (c) => console.log(`[open-seat/discord] ready as ${c.user.tag} in ${c.guilds.cache.size} server(s). mention it in a channel to post open seats; DM it to join.`));
   client.login(token).catch((error) => {
-    console.error("[down/discord] login failed:", error.message);
-    store.downDiscord = undefined;
+    console.error("[open-seat/discord] login failed:", error.message);
+    store.openSeatDiscord = undefined;
   });
 }

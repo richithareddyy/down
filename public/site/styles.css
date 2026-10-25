@@ -201,8 +201,8 @@ em { font-style: italic; color: var(--rust); }
 .stage-lines { position: absolute; inset: 22px 22px 54px; width: calc(100% - 44px); height: calc(100% - 76px); pointer-events: none; }
 .stage-lines .ln { stroke: var(--line-strong); stroke-width: 1.2; stroke-dasharray: 3 5; vector-effect: non-scaling-stroke; fill: none; opacity: 0; transition: opacity .6s, stroke .6s; }
 .stage:not([data-step="1"]) .ln { opacity: 1; }
-.stage[data-step="3"] .ln-a, .stage[data-step="4"] .ln, .stage[data-step="5"] .ln { stroke: var(--rust); stroke-dasharray: none; stroke-width: 1.8; }
-.stage[data-step="3"] .ln-m, .stage[data-step="3"] .ln-j, .stage[data-step="3"] .ln-d { opacity: .18; }
+.stage[data-step="3"] .ln-a, .stage[data-step="3"] .ln-m, .stage[data-step="4"] .ln-j, .stage[data-step="4"] .ln-d, .stage[data-step="5"] .ln { stroke: var(--rust); stroke-dasharray: none; stroke-width: 1.8; }
+.stage[data-step="3"] .ln-j, .stage[data-step="3"] .ln-d, .stage[data-step="4"] .ln-a, .stage[data-step="4"] .ln-m { opacity: .18; }
 
 .agent {
   position: relative; z-index: 1; align-self: center;
@@ -214,8 +214,8 @@ em { font-style: italic; color: var(--rust); }
 .agent p { font: 400 1.05rem/1.18 var(--serif); color: var(--ink-soft); }
 .agent-a { grid-area: a; } .agent-m { grid-area: m; } .agent-j { grid-area: j; } .agent-d { grid-area: d; }
 .avatar { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--rust-tint); color: var(--rust); font: 400 21px/1 var(--serif); }
-.stage[data-step="3"] .agent-m, .stage[data-step="3"] .agent-j, .stage[data-step="3"] .agent-d { opacity: .38; }
-.stage[data-step="3"] .agent-a, .stage[data-step="5"] .agent { border-color: var(--rust); transform: translateY(-2px); }
+.stage[data-step="3"] .agent-j, .stage[data-step="3"] .agent-d, .stage[data-step="4"] .agent-a, .stage[data-step="4"] .agent-m { opacity: .38; }
+.stage[data-step="3"] .agent-a, .stage[data-step="3"] .agent-m, .stage[data-step="4"] .agent-j, .stage[data-step="4"] .agent-d, .stage[data-step="5"] .agent { border-color: var(--rust); transform: translateY(-2px); }
 
 .verdict {
   position: absolute; top: -10px; right: 12px;
@@ -457,3 +457,23 @@ input[type="range"] { width: 100%; accent-color: var(--rust); height: 24px; curs
 .group-post p { margin-top: 6px; }
 .v.maybe { border: 1px dashed var(--rust); color: var(--rust); }
 .v.unknown { border: 1px dashed var(--line-strong); color: var(--muted); }
+
+/* try: what-if toggles sit tighter */
+.terms fieldset .toggle { margin-top: 8px; }
+.ledger .lvl { display: inline-block; min-width: 26px; margin-right: 6px; padding: 1px 6px; border-radius: 6px; font: 500 10.5px/1.5 var(--mono); text-align: center; background: var(--paper-deep); color: var(--ink-soft); }
+.ledger .lvl.l2 { background: var(--rust-tint); color: var(--rust); }
+.ledger .lvl.l3 { background: var(--ink); color: var(--paper); }
+.ledger .row { font: 400 12px/1.5 var(--mono); color: var(--ink-soft); padding: 5px 0; border-top: 1px dashed var(--line); }
+.ledger .row:first-child { border-top: 0; }
+.ledger .row .who { color: var(--ink); }
+.ledger .row.miss { color: var(--muted); }
+
+.whatif { margin-top: 4px; }
+.whatif summary { cursor: pointer; font: 500 12px var(--mono); color: var(--muted); list-style: none; }
+.whatif summary::before { content: "+ "; color: var(--rust); }
+.whatif[open] summary::before { content: "− "; }
+.whatif .toggle { margin-top: 10px; }
+
+.live-card .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.say { margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); font: 400 14px/1.45 var(--sans); color: var(--ink); }
+.say .micro { display: block; margin-bottom: 4px; color: var(--muted); }

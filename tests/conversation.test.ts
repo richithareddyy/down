@@ -1,119 +1,148 @@
-import { describe, expect, test } from "vitest";
-import { respond, viewKey } from "../src/channels/conversation";
-import { PlanRuntime } from "../src/server/plan-runtime";
-import { termsFallback } from "../src/agents/language";
+import { describe, expect, test, vi } from "vitest";
+import { handlePost, noteFor, respondDM, type DmContext, type PostContext } from "../src/channels/conversation";
+import { Hub } from "../src/seat/hub";
+import { groupFallback, RequestLanguage, seekerFallback } from "../src/agents/language";
+import { groupFrom } from "../src/seat/post";
 
-// Stand-in for the language model: the rule-based reader, so tests never call the API.
-const setup = () => new PlanRuntime(async (text) => termsFallback(text));
-const say = (rt: PlanRuntime, id: string, text: string) => respond(rt, id, text);
+const NOW = "13:30";
 const all = (lines: string[]) => lines.join("\n");
+const dm = (hub: Hub, userId: string, text: string, guilds = ["asu"]) =>
+  respondDM(hub, { userId, guilds, now: NOW, parse: async (t, _a, n) => seekerFallback(t, n) } satisfies DmContext, text);
+const post = (hub: Hub, authorId: string, text: string, opts: Partial<PostContext> = {}) =>
+  handlePost(hub, { authorId, authorName: authorId, guildId: "asu", channelId: "c1", mentions: [], now: NOW, parse: async (t, n) => groupFallback(t, n), ...opts }, text);
 
-describe("plan over DMs", () => {
-  test("how you feel is read back privately and does nothing until you say yes", async () => {
-    const rt = setup();
-    rt.claim("alex");
-    const r = await say(rt, "alex", "honestly i'd rather skip, under $10, home by 11, only if 2 others feel the same");
-    expect(all(r)).toMatch(/kept between us/);
-    expect(all(r)).toMatch(/\$10 max · home by 11 pm/);
-    expect(all(r)).toMatch(/at least 2 others/);
-    expect(rt.board.stage).toBe("idle");
+const COURT = "6 of us on court 2 playing 3v3 till 2:30, we'd go 4v4 if exactly 2 more join, beginners welcome";
+const ALEX = "basketball, beginner, free 1:30 to 2:30, won't go if i'm the only new one";
+const JORDAN = "down to hoop, casual, free from 1:30, hard stop at 2:20 for lab";
+
+describe("a real server: a group posts, two strangers DM, the agents arrange it", () => {
+  test("a mention posts the open seat, with a sub picked by mention", async () => {
+    const hub = new Hub();
+    const reply = await post(hub, "sam", COURT, { mentions: [{ id: "dave", name: "Dave" }] });
+    expect(reply).toMatch(/open seat:.*court 2/);
+    expect(reply).toMatch(/4v4 if exactly 2 more join · till 2:30 pm · Dave can sub/);
+    expect(reply).toMatch(/DM me your terms, privately/);
+    expect([...hub.groups.values()][0].group).toMatchObject({ captainId: "sam", subId: "dave", playing: 6, kind: "basketball" });
   });
 
-  test("off-topic messages get a question, not invented terms", async () => {
-    const rt = setup();
-    rt.claim("alex");
-    expect(all(await say(rt, "alex", "what's everyone wearing"))).toMatch(/how do you feel about the plan/);
-    expect(rt.view("alex").terms).toBeNull();
+  test("one student alone gets nothing; the second one completes it; the sub is asked first", async () => {
+    const hub = new Hub();
+    await post(hub, "sam", COURT, { mentions: [{ id: "dave", name: "Dave" }] });
+    await dm(hub, "alex", ALEX);
+    expect(all(await dm(hub, "alex", "yes"))).toMatch(/locked in/);
+    await dm(hub, "jordan", JORDAN);
+    await dm(hub, "jordan", "yes");
+    expect(noteFor(hub.views("dave")[0].view)).toMatch(/can you sub in\?[\s\S]*leave at 2:20 pm/);
+    expect(hub.pending("alex")).toBeNull(); // nobody else hears while the sub decides
+    await dm(hub, "dave", "yes");
+    expect(noteFor(hub.pending("alex")!.view)).toMatch(/a seat is open for you[\s\S]*1 other newcomer/);
+    expect(noteFor(hub.pending("sam")!.view)).toMatch(/2 newcomers can fill your seats/);
   });
 
-  test("the yes that starts a round brings the private ask in the same reply", async () => {
-    const rt = setup();
-    rt.claim("alex");
-    await say(rt, "alex", "i'd rather skip, under $10, home by 11, only if 2 others feel the same");
-    const r = await say(rt, "alex", "yes");
-    expect(all(r)).toMatch(/one small ask, just for you/);
-    expect(all(r)).toMatch(/\$12 instead of \$10/);
-    expect(all(r)).toMatch(/nobody will know it was you/);
-    expect(all(r)).not.toMatch(/maya|jay|dev/i);
+  test("everyone confirms; names unlock only then", async () => {
+    const hub = new Hub();
+    for (const [id, name] of [["sam", "Sam"], ["dave", "Dave"], ["alex", "Alex"], ["jordan", "Jordan"]]) hub.setName(id, name);
+    await post(hub, "sam", COURT, { authorName: "Sam", mentions: [{ id: "dave", name: "Dave" }] });
+    for (const [id, text] of [["alex", ALEX], ["jordan", JORDAN]]) { await dm(hub, id, text); await dm(hub, id, "yes"); }
+    await dm(hub, "dave", "yes");
+    await dm(hub, "alex", "yes");
+    await dm(hub, "jordan", "yes");
+    const last = all(await dm(hub, "sam", "yes"));
+    expect(last).toMatch(/you're in[\s\S]*with: Sam, Dave, (Alex, Jordan|Jordan, Alex)/);
+    expect([...hub.groups.values()][0].board.announcement()).toMatchObject({ newcomers: 2 });
   });
 
-  test("yes to the ask, then yes to the version: everyone's in, and only then names appear", async () => {
-    const rt = setup();
-    rt.claim("alex");
-    await say(rt, "alex", "i'd rather skip, under $10, home by 11, only if 2 others feel the same");
-    await say(rt, "alex", "yes");
-    const ask = await say(rt, "alex", "yes");
-    expect(all(ask)).toMatch(/a version all of you can do/);
-    expect(all(ask)).not.toMatch(/maya|jay|dev/i);
-    const done = await say(rt, "alex", "yes");
-    expect(all(done)).toMatch(/it's on/);
-    expect(all(done)).toMatch(/alex, maya, jay, dev/);
+  test("a student is only matched in servers they belong to", async () => {
+    const hub = new Hub();
+    await post(hub, "sam", COURT, { mentions: [{ id: "dave", name: "Dave" }] });
+    await dm(hub, "alex", ALEX, ["other-server"]);
+    await dm(hub, "alex", "yes", ["other-server"]);
+    await dm(hub, "jordan", JORDAN);
+    await dm(hub, "jordan", "yes");
+    expect(hub.pending("alex")).toBeNull();
+    expect(hub.views("dave")[0].view.stage).toBe("none");
   });
 
-  test("no to the ask keeps the limit, and the agents bring a version for most of the group", async () => {
-    const rt = setup();
-    rt.claim("alex");
-    await say(rt, "alex", "i'd rather skip, under $10, home by 11, only if 2 others feel the same");
-    await say(rt, "alex", "yes");
-    const r = await say(rt, "alex", "no");
-    expect(all(r)).toMatch(/that limit stays/);
-    expect(all(r)).toMatch(/open mic night/);
-    expect(all(r)).toMatch(/original plan still stands/);
+  test("two groups at once: a student is held by only one arrangement", async () => {
+    const hub = new Hub();
+    await post(hub, "sam", COURT, { mentions: [{ id: "dave", name: "Dave" }] });
+    await post(hub, "kim", "6 of us at the rec center playing 3v3 till 2:30, 4v4 if exactly 2 more join", { channelId: "c2" });
+    await dm(hub, "alex", ALEX); await dm(hub, "alex", "yes");
+    await dm(hub, "casey", "basketball, casual, free 1:30 to 3"); await dm(hub, "casey", "yes");
+    const holding = [...hub.groups.values()].filter((r) => r.board.holds("alex"));
+    expect(holding).toHaveLength(1);
   });
 
-  test("two real people: each one only ever hears their own ask", async () => {
-    const rt = setup();
-    rt.claim("alex");
-    rt.claim("maya");
-    await say(rt, "maya", "can't do $40, anything under $10 works");
-    await say(rt, "maya", "yes");
-    await say(rt, "alex", "i'd rather skip, under $10, home by 11, only if 2 others feel the same");
-    await say(rt, "alex", "yes");
-    // both have a $10 cap, so both get their own private ask; neither hears about the other's
-    expect(rt.view("alex").stage).toBe("stretch");
-    expect(rt.view("maya").stage).toBe("stretch");
-    await say(rt, "alex", "yes");
-    expect(rt.view("alex").stage).toBe("none"); // still waiting, and it doesn't say on whom
-    expect(JSON.stringify(rt.view("alex"))).not.toMatch(/maya/i);
+  test("a student who passes is never told who else was in it, and the group keeps looking", async () => {
+    const hub = new Hub();
+    await post(hub, "sam", COURT, { mentions: [{ id: "dave", name: "Dave" }] });
+    for (const [id, text] of [["alex", ALEX], ["jordan", JORDAN]]) { await dm(hub, id, text); await dm(hub, id, "yes"); }
+    await dm(hub, "dave", "yes");
+    expect(all(await dm(hub, "alex", "pass"))).toMatch(/nobody learns it was you/);
+    expect(JSON.stringify(hub.views("alex").map(({ view }) => view))).not.toMatch(/jordan/i);
+  });
+
+  test("the captain can close their post", async () => {
+    const hub = new Hub();
+    await post(hub, "sam", COURT);
+    expect(await post(hub, "sam", "done")).toMatch(/closed/);
+    expect(hub.groups.size).toBe(0);
+  });
+
+  test("demo adds a labeled demo game and two demo students, so one person can try it", async () => {
+    const hub = new Hub();
+    expect(await post(hub, "you", "demo")).toMatch(/demo players added/);
+    await dm(hub, "you", "basketball, beginner, free for an hour, not if i'm the only new one");
+    const r = all(await dm(hub, "you", "yes"));
+    expect(r).toMatch(/a seat is open for you/);
+    await dm(hub, "you", "yes");
+    expect(noteFor(hub.views("you")[0].view)).toMatch(/you're in[\s\S]*Sam \(demo\)/);
   });
 
   test("off-topic replies during a decision get a reminder, not a decision", async () => {
-    const rt = setup();
-    rt.claim("alex");
-    await say(rt, "alex", "i'd rather skip, under $10, only if 2 others feel the same");
-    await say(rt, "alex", "yes");
-    const before = viewKey(rt.view("alex"));
-    expect(all(await say(rt, "alex", "lol what"))).toMatch(/reply \*\*yes\*\* or \*\*no\*\*/);
-    expect(viewKey(rt.view("alex"))).toBe(before);
+    const hub = new Hub();
+    await post(hub, "x", "demo");
+    await dm(hub, "alex", ALEX); await dm(hub, "alex", "yes");
+    expect(all(await dm(hub, "alex", "lol what"))).toMatch(/reply \*\*yes\*\* or \*\*pass\*\*/);
   });
 
-  test("never mind drops your terms", async () => {
-    const rt = setup();
-    rt.claim("alex");
-    await say(rt, "alex", "i'd rather skip, under $15");
-    expect(all(await say(rt, "alex", "never mind"))).toMatch(/dropped/);
-    expect(rt.view("alex").terms).toBeNull();
+  test("never mind drops your terms everywhere", async () => {
+    const hub = new Hub();
+    await dm(hub, "alex", ALEX);
+    expect(all(await dm(hub, "alex", "never mind"))).toMatch(/dropped/);
+    expect(hub.terms("alex")).toBeNull();
   });
 });
 
-describe("rule-based reader (used when the model is unavailable)", () => {
-  test("catches budget, curfew and threshold, and ignores the plan's own price", () => {
-    expect(termsFallback("i said yes but $40 is a lot. under $10, home by 11, only if 2 others feel the same")).toMatchObject({
-      kind: "parsed", terms: { wantsChange: true, conditions: { activityTags: ["any"], maxPrice: 10, endsBefore: "23:00" }, minOthers: 2 },
-    });
+describe("the reader", () => {
+  test("seeker rules: kind, window, hard stop, level, not-alone; times default to now", () => {
+    expect(seekerFallback(ALEX)).toEqual({ kind: "parsed", source: "rules", terms: { kinds: ["basketball"], freeFrom: "13:30", freeUntil: "14:30", level: "new", notAlone: true } });
+    expect(seekerFallback("down to hoop, casual. hard stop at 2:20 for chem lab", "13:00")).toMatchObject({ terms: { freeFrom: "13:00", freeUntil: "14:20", level: "casual" } });
+    expect(seekerFallback("basketball whenever", "16:10")).toMatchObject({ terms: { freeFrom: "16:10", freeUntil: "17:10" } });
+    expect(seekerFallback("what's for dinner")).toMatchObject({ kind: "clarify" });
   });
 
-  test("happy people are read as happy, with no threshold", () => {
-    expect(termsFallback("honestly i'm excited for it")).toMatchObject({ kind: "parsed", terms: { wantsChange: false, minOthers: 0 } });
+  test("group rules: count, formats, seats, end time, place", () => {
+    expect(groupFallback(COURT, NOW)).toMatchObject({ kind: "parsed", group: { kind: "basketball", playing: 6, current: "3v3", next: "4v4", seats: 2, until: "14:30", place: "court 2", beginnersWelcome: true } });
+    expect(groupFallback("anyone wanna hang", NOW)).toMatchObject({ kind: "clarify" });
   });
 
-  test("'not a club person' rules clubs out; 'most of us' sets the majority rule", () => {
-    expect(termsFallback("not a club person, i'd rather skip")).toMatchObject({ terms: { avoidTags: ["club"] } });
-    expect(termsFallback("too expensive, only if most of us feel the same")).toMatchObject({ terms: { majorityOnly: true } });
+  test("a post becomes two versions: starting soon, and ten minutes later", () => {
+    const g = groupFrom((groupFallback(COURT, "13:32") as { group: Parameters<typeof groupFrom>[0] }).group, "sam", "dave", "13:32");
+    expect(g.versions.map((v) => v.start)).toEqual(["13:40", "13:50"]);
+    expect(g.versions[0]).toMatchObject({ size: 8, end: "14:30" });
   });
 
-  test("without a key the reader falls back to the rules", async () => {
-    const { RequestLanguage } = await import("../src/agents/language");
-    expect(await new RequestLanguage("").parseTerms("i'd rather skip, under $10", "club night")).toMatchObject({ kind: "parsed", source: "rules", terms: { conditions: { maxPrice: 10 } } });
+  const reply = (text: string, stop_reason = "end_turn") =>
+    vi.fn<typeof fetch>().mockResolvedValue(Response.json({ id: "m", type: "message", role: "assistant", model: "m", stop_reason, content: text ? [{ type: "text", text }] : [], usage: { input_tokens: 1, output_tokens: 1 } }));
+
+  test("model readings become terms; a bad, refused or failed reading falls back to the rules", async () => {
+    const good = JSON.stringify({ kind: "parsed", terms: { kinds: ["basketball"], freeFrom: "13:30", freeUntil: "14:20", level: "new", notAlone: true }, question: "" });
+    expect(await new RequestLanguage("k", reply(good)).parseSeeker("x", "court", NOW)).toMatchObject({ source: "model", terms: { freeUntil: "14:20" } });
+    const bad = JSON.stringify({ kind: "parsed", terms: { kinds: ["basketball"], freeFrom: "15:00", freeUntil: "14:00", level: "new", notAlone: true }, question: "" });
+    for (const mock of [reply(bad), reply("", "refusal"), vi.fn<typeof fetch>().mockRejectedValue(new Error("offline"))])
+      expect(await new RequestLanguage("k", mock).parseSeeker(ALEX, "court", NOW)).toMatchObject({ source: "rules" });
+    const group = JSON.stringify({ kind: "parsed", group: { title: "pickup basketball", kind: "basketball", place: "court 2", playing: 6, current: "3v3 half court", seats: 2, next: "4v4 full court", until: "14:30", beginnersWelcome: true, vibe: "casual" }, question: "" });
+    expect(await new RequestLanguage("k", reply(group)).parseGroup(COURT, NOW)).toMatchObject({ source: "model", group: { seats: 2, next: "4v4 full court" } });
   });
 });

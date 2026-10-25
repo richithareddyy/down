@@ -1,6 +1,6 @@
 # Down? website
 
-The public website for down?, by Team Southside. Plain HTML, CSS and JavaScript: no build step, no keys, no login.
+The public website for Open Seat, by Team Southside. Plain HTML, CSS and JavaScript: no build step, no keys, no login.
 
 From the repository root:
 
@@ -12,17 +12,8 @@ Open http://localhost:3001. The Next.js homepage also redirects here. To host it
 
 ## What's on the page
 
-- The story: everyone said yes to the group's $40 club night, but most of them would change something. Each student tells only their own agent. The agents try versions of the plan against everyone's private terms, privately ask anyone who'd need to stretch a little, and the group hears the version everyone said yes to, with no names.
-- An illustrated hero scene (inline SVG), the research behind it, and a scroll-driven walkthrough of one negotiation.
-- "Okay, are you not down?": the visitor plays Alex. Served by the app, it calls `/api/try` (the prototype's engine, plus the language model for free text). Hosted as static files, `prototype.js` runs the same rules in the browser.
-- The live section links the Discord demo server.
+- The idea in one line, an illustrated hero, the research behind the walk-up problem, and a scroll-driven walkthrough of one arrangement (two solo students, a game that needs exactly two more, a sub on the sideline).
+- "Want in? You're Alex": type your terms (Claude reads them) or use the controls, and take your seat. The what-ifs show the agents reshaping the game. It calls `/api/try`, the same engine as the Discord bot, on a fresh board for each visitor.
+- How to add the bot to any Discord server, and what to type.
 
-All people, events and prices are fictional. The page stores nothing.
-
-## Tests
-
-```sh
-npm test -- tests/site-prototype.test.ts
-```
-
-Checks that the in-browser rules give the same result as the prototype's engine for every combination of Alex's terms and answers.
+All people in the demo are fictional. The page stores nothing.

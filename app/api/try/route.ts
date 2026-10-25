@@ -1,9 +1,9 @@
-// The website's "try it" demo. Each request builds a fresh board (the visitor is Alex, the three
-// friends are demo agents), so visitors never share state. Same reader and rules as the Discord bot.
+// The website's "try it" demo. Each request builds a fresh board (the visitor is Alex, the others
+// are demo players), so visitors never share state. Same reader and rules as the Discord bot.
 import { z } from "zod";
 import { RequestLanguage } from "../../../src/agents/language";
-import { groupPlan } from "../../../src/demo/seed";
-import { planLabel, tryPlan } from "../../../src/server/plan-runtime";
+import { court } from "../../../src/seat/demo";
+import { activityLabel, trySeat } from "../../../src/seat/runtime";
 import { sameOrigin } from "../../../src/server/http";
 
 export const runtime = "nodejs";
@@ -12,17 +12,18 @@ export const dynamic = "force-dynamic";
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 const terms = z
   .object({
-    wantsChange: z.boolean(),
-    conditions: z.object({ activityTags: z.array(z.string().max(30)).min(1).max(6), maxPrice: z.number().min(0).max(1000).optional(), endsBefore: time.optional() }).strict(),
-    avoidTags: z.array(z.string().max(30)).max(6).optional(),
-    minOthers: z.number().int().min(0).max(3).optional(),
-    majorityOnly: z.boolean().optional(),
+    kinds: z.array(z.string().max(30)).min(1).max(5),
+    freeFrom: time,
+    freeUntil: time,
+    level: z.enum(["new", "casual", "competitive"]),
+    notAlone: z.boolean(),
   })
   .strict();
-const action = z.union([z.object({ type: z.enum(["stretch", "consent"]), yes: z.boolean() }).strict(), z.object({ type: z.literal("join") }).strict()]);
+const options = z.object({ others: z.array(z.enum(["jordan", "priya", "riley"])).max(3).optional(), daveSubs: z.boolean().optional() }).strict();
+const action = z.object({ type: z.literal("confirm"), yes: z.boolean() }).strict();
 const body = z.union([
-  z.object({ text: z.string().trim().min(1).max(280) }).strict(),
-  z.object({ terms, actions: z.array(action).max(12).default([]) }).strict(),
+  z.object({ text: z.string().trim().min(1).max(280), options: options.optional() }).strict(),
+  z.object({ terms, options: options.optional(), actions: z.array(action).max(8).default([]) }).strict(),
 ]);
 
 // Reading words calls the language model; keep it to a few reads per visitor per minute.
@@ -44,9 +45,9 @@ export async function POST(request: Request) {
   if ("text" in input) {
     const who = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
     if (!allowRead(who)) return Response.json({ error: "slow down a little. try again in a minute." }, { status: 429 });
-    const read = await new RequestLanguage().parseTerms(input.text, planLabel(groupPlan));
+    const read = await new RequestLanguage().parseSeeker(input.text, activityLabel(court));
     if (read.kind === "clarify") return Response.json({ clarify: read.question });
-    return Response.json({ terms: read.terms, source: read.source, result: tryPlan(read.terms) }, { headers: { "Cache-Control": "no-store" } });
+    return Response.json({ terms: read.terms, source: read.source, result: trySeat(read.terms, input.options) }, { headers: { "Cache-Control": "no-store" } });
   }
-  return Response.json({ result: tryPlan(input.terms, input.actions) }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ result: trySeat(input.terms, input.options, input.actions) }, { headers: { "Cache-Control": "no-store" } });
 }

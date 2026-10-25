@@ -1,4 +1,3 @@
-import { DEFAULT_ALEX, VERSIONS, tryPlan } from './prototype.js?v=6';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.documentElement.classList.add('js');
@@ -85,84 +84,69 @@ window.addEventListener('scroll', queueStep, { passive: true });
 window.addEventListener('resize', queueStep);
 pickStep();
 
-/* ---------- try: Alex's side of a negotiation ---------- */
-// The server runs the prototype's own engine (and reads free text with the language model). If the
-// site is hosted without it, the same rules run here in the browser (prototype.js, tested to match).
+/* ---------- try: Alex looking for a game ---------- */
+// Every answer comes from the prototype's engine on our server (and the language model reads free text).
 const form = document.querySelector('#terms');
 const view = document.querySelector('#view');
 const ledger = document.querySelector('#ledger');
 const phase = document.querySelector('#phase');
-const price = document.querySelector('#price');
-const priceOut = document.querySelector('#price-out');
-const change = document.querySelector('#change');
-const othersSet = document.querySelector('#others-set');
+const alone = document.querySelector('#alone');
 const words = document.querySelector('#words');
 const say = document.querySelector('#say');
 const readBtn = document.querySelector('#read');
 const readNote = document.querySelector('#read-note');
 const engineLabel = document.querySelector('#engine-label');
 
-let server = false;
-let terms = null; // Alex's terms once told to the agent
+const DEFAULT = { kinds: ['basketball'], freeFrom: '13:30', freeUntil: '14:30', level: 'new', notAlone: true };
+let terms = null;
 let actions = [];
 let result = null;
 let busy = false;
-let pendingTimer = null;
+let timer = null;
 
-const PHASES = {
-  idle: 'nothing said yet', none: 'quietly waiting', stretch: 'a private ask', consent: 'a private question',
-  waiting: 'waiting on the others', announced: 'the group heard it', closed: 'no version this time',
-};
-const VERDICT = { fits: 'fits', stretch: 'close', no: 'no', unknown: '?' };
-const V_CLASS = { fits: 'yes', stretch: 'maybe', no: 'no', unknown: 'unknown' };
-
+const PHASES = { idle: 'nothing said yet', none: 'quietly looking', confirm: 'a seat is ready', waiting: 'waiting on the others', seated: 'you’re in', closed: 'no arrangement' };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const clock = t => { const [h, m] = t.split(':').map(Number); return `${h % 12 || 12}${m ? `:${String(m).padStart(2, '0')}` : ''} ${h < 12 ? 'am' : 'pm'}`; };
 const list = names => names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} &amp; ${names.at(-1)}`;
-const btn = (label, action, { ghost = false, yes = '' } = {}) =>
-  `<button type="button" class="pill${ghost ? ' ghost' : ''}" data-action="${action}" data-yes="${yes}">${label}</button>`;
-const waitingDots = text => `<p class="waiting"><i></i><i></i><i></i> ${text}</p>`;
-const versionLine = o => `<p class="meta">${esc(o.title)} · ${esc(o.day)} ${clock(o.start)}–${clock(o.end)} · ${o.price ? `$${o.price}` : 'free'}</p>`;
-const PLAN_LINE = '<p class="meta">club night downtown · fri 10 pm–1 am · $40</p>';
-const titleOf = id => VERSIONS.find(v => v.id === id)?.title ?? id;
+const btn = (label, action, { ghost = false, yes = '' } = {}) => `<button type="button" class="pill${ghost ? ' ghost' : ''}" data-action="${action}" data-yes="${yes}">${label}</button>`;
+const dots = text => `<p class="waiting"><i></i><i></i><i></i> ${text}</p>`;
+const versionLine = v => `<p class="meta">${esc(v.label)} · ${clock(v.start)}–${clock(v.end)} · court 2</p>`;
 
 function readTerms() {
-  const home = form.querySelector('input[name="home"]:checked').value;
-  const wantsChange = change.checked;
   return {
-    wantsChange,
-    conditions: { activityTags: ['any'], maxPrice: Number(price.value), ...(home ? { endsBefore: home } : {}) },
-    minOthers: wantsChange ? Number(form.querySelector('input[name="others"]:checked').value) : 0,
+    kinds: ['basketball'],
+    freeFrom: '13:30',
+    freeUntil: form.querySelector('input[name="until"]:checked').value,
+    level: form.querySelector('input[name="level"]').value,
+    notAlone: alone.checked,
   };
 }
-
-function showTerms(t) {
-  change.checked = t.wantsChange;
-  const cap = t.conditions.maxPrice;
-  price.value = cap == null ? 20 : Math.min(20, cap);
-  priceOut.textContent = cap == null ? 'no cap' : `$${cap}`;
-  const home = t.conditions.endsBefore ?? '';
-  const radio = form.querySelector(`input[name="home"][value="${home}"]`);
-  if (radio) radio.checked = true;
-  const others = form.querySelector(`input[name="others"][value="${Math.min(3, Math.max(1, t.minOthers ?? 1))}"]`);
-  if (others) others.checked = true;
-  othersSet.disabled = !t.wantsChange;
+function readOptions() {
+  const others = ['riley'];
+  if (form.querySelector('#w-jordan').checked) others.unshift('jordan');
+  if (form.querySelector('#w-priya').checked) others.splice(others.length - 1, 0, 'priya');
+  return { others, daveSubs: form.querySelector('#w-dave').checked };
 }
+function showTerms(t) {
+  alone.checked = !!t.notAlone;
+  form.querySelector('input[name="level"]').value = t.level;
+  const nearest = ['14:20', '14:30', '15:00'].reduce((best, x) => Math.abs(toMin(x) - toMin(t.freeUntil)) < Math.abs(toMin(best) - toMin(t.freeUntil)) ? x : best, '14:30');
+  form.querySelector(`input[name="until"][value="${nearest}"]`).checked = true;
+}
+const toMin = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3));
 
-async function compute() {
-  if (server) {
-    try {
-      const r = await fetch('/api/try', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ terms, actions }) });
-      if (r.ok) return (await r.json()).result;
-    } catch { /* fall through to the browser copy */ }
-  }
-  return tryPlan(terms, actions);
+async function post(body) {
+  const r = await fetch('/api/try', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  const json = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(json.error || 'the demo server didn’t answer');
+  return json;
 }
 
 async function refresh() {
   if (!terms) { result = null; render(); return; }
   busy = true;
-  result = await compute();
+  try { result = (await post({ terms, options: readOptions(), actions })).result; }
+  catch (e) { result = null; view.innerHTML = `<div class="state"><h3>couldn’t reach the agents.</h3><p>${esc(e.message)}. try again in a moment.</p></div>`; busy = false; return; }
   busy = false;
   render();
 }
@@ -170,113 +154,74 @@ async function refresh() {
 function renderView() {
   const v = result?.view;
   const stage = !v ? 'idle' : v.stage;
-  phase.textContent = PHASES[stage];
-  const ask = v?.stretch && (v.stretch.field === 'maxPrice'
-    ? `<b>$${v.stretch.to} instead of $${v.stretch.from}</b>`
-    : `<b>staying till ${clock(v.option.end)}</b> instead of being home by ${clock(v.stretch.from)}`);
-  const group = v?.everyone ? 'your whole group' : `${esc(v?.shareWords ?? '')}`;
+  phase.textContent = PHASES[stage] ?? '';
+  const r = v?.rotation;
   switch (stage) {
     case 'idle':
-      view.innerHTML = `<div class="state"><span class="signal" aria-hidden="true">( ? )</span><h3>the club night is the plan.</h3>${PLAN_LINE}
-        <p>Everyone typed “sounds fun lol.” Tell your agent how you really feel. Nothing is shared unless a version works.</p></div>`;
+      view.innerHTML = `<div class="state"><span class="signal" aria-hidden="true">( ? )</span><h3>court 2 is playing 3v3.</h3><p class="meta">sun devil fitness complex · 1:30 pm · beginners fine</p>
+        <p>They’d go 4v4 if exactly two more joined. Tell your agent your terms. You’ll only hear back when there’s a complete seat for you.</p></div>`;
       break;
     case 'none':
-      view.innerHTML = `<div class="state"><span class="signal" aria-hidden="true">( · )</span><h3>quietly waiting.</h3>
-        <p>${terms.wantsChange ? 'Not enough of you want a change on your terms yet, so nothing moves. Nobody knows you said anything.' : 'You’re happy with the plan. Your agent only speaks up if the others find a version that fits you too.'}</p></div>`;
+      view.innerHTML = `<div class="state"><span class="signal" aria-hidden="true">( · )</span><h3>quietly looking.</h3>
+        <p>No arrangement fits your terms yet. Nobody saw your request, and you won’t get counteroffers or failed searches.</p></div>
+        <p class="hint">try a what-if: let jordan or priya look too.</p>`;
       break;
-    case 'stretch':
-      view.innerHTML = `<div class="card"><p class="micro tag">just you &amp; your agent</p><h3>✳ one small ask, just for you.</h3>
-        <p>Your friends’ agents found a version that works for ${group}:</p>${versionLine(v.option)}
-        <p>It works if you can do ${ask}. Ok? Nobody will know it was you.</p>
-        <div class="actions">${btn('yes, i can <span aria-hidden="true">↗</span>', 'stretch', { yes: '1' })}${btn('no, keep my limit', 'stretch', { ghost: true, yes: '0' })}</div></div>`;
-      break;
-    case 'consent':
-      view.innerHTML = `<div class="card"><p class="micro tag">same question everyone gets</p><h3>✳ a version ${v.everyone ? 'all of you' : esc(v.shareWords)} can do.</h3>
-        ${versionLine(v.option)}
-        <p>${v.everyone ? 'Would you switch to it? Nobody learns who wanted a change, or anyone’s limits.' : 'No version fits everyone, but this one fits you. The club night still stands for anyone who wants it. Switch?'}</p>
-        <div class="actions">${btn('yes, switch <span aria-hidden="true">↗</span>', 'consent', { yes: '1' })}${btn('pass', 'consent', { ghost: true, yes: '0' })}</div></div>`;
+    case 'confirm':
+      view.innerHTML = `<div class="card"><p class="micro tag">one complete seat</p><h3>✳ a seat is open for you.</h3>
+        ${versionLine(v.version)}
+        <p>${v.newcomers ? `You won’t be the only new one: ${v.newcomers} other newcomer${v.newcomers === 1 ? '' : 's'} join${v.newcomers === 1 ? 's' : ''} with you.` : 'You’re the newcomer the game needs.'}${r ? (r.you ? ` You can leave at ${clock(r.at)}: a sub rotates in for you.` : ` One newcomer leaves at ${clock(r.at)} and a sub rotates in.`) : ''}</p>
+        <p class="hint">names and the court unlock when everyone confirms.</p>
+        <div class="actions">${btn('take my seat <span aria-hidden="true">↗</span>', 'confirm', { yes: '1' })}${btn('pass', 'confirm', { ghost: true, yes: '0' })}</div></div>`;
       break;
     case 'waiting':
-      view.innerHTML = `<div class="card"><h3>counted.</h3>${versionLine(v.option)}${waitingDots('waiting on the others’ private answers')}</div>`;
+      view.innerHTML = `<div class="card"><h3>confirmed.</h3>${versionLine(v.version)}${dots('waiting on the others')}</div>`;
       break;
-    case 'announced': {
-      const post = result.announcement.everyone
-        ? `<div class="group-post"><span class="micro">posted in the group channel</span><p>✳ new version of the plan: all of you are down.</p>${versionLine(result.announcement.option)}<p class="micro">no names · no reasons · nobody went first</p></div>`
-        : `<div class="group-post"><span class="micro">posted in the group channel</span><p>✳ ${esc(result.announcement.words)} are doing something else this time.</p>${versionLine(result.announcement.option)}<p class="micro">the club night still stands · anyone can join</p></div>`;
-      view.innerHTML = v.ownJoined
-        ? `<div class="state"><span class="signal" aria-hidden="true">✳</span><h3>it’s on.</h3>${versionLine(v.option)}<p>You’re in with ${list(v.joined)}.</p></div>${post}`
-        : `<div class="card"><h3>✳ a new version in your group.</h3><p>It didn’t fit your terms, so you weren’t asked. Joining is your call.</p>${versionLine(v.option)}
-            <div class="actions">${btn('i’m in <span aria-hidden="true">↗</span>', 'join')}</div></div>${post}`;
+    case 'seated': {
+      const a = result.announcement;
+      view.innerHTML = `<div class="state"><span class="signal" aria-hidden="true">✳</span><h3>you’re in.</h3>${versionLine(v.version)}<p>With ${list(v.names)}.${r ? ` Rotation at ${clock(r.at)}.` : ''}</p></div>
+        <div class="group-post"><span class="micro">posted in the group channel</span><p>✳ open seat filled: 3v3 half court → ${esc(a.version.label)} from ${clock(a.version.start)}.</p><p class="micro">${a.newcomers} newcomers · nobody had to walk up and ask</p></div>`;
       break;
     }
     case 'closed':
-      view.innerHTML = `<div class="state"><span class="signal" aria-hidden="true">( · )</span><h3>no version worked this time.</h3>
-        <p>The club night stands, and nobody learns why. Your terms stay private.</p>
+      view.innerHTML = `<div class="state"><span class="signal" aria-hidden="true">( · )</span><h3>no arrangement this time.</h3><p>Nobody was named, and nobody learns why. Your terms stay private.</p>
         <div class="actions">${btn('start over', 'reset', { ghost: true })}</div></div>`;
       break;
   }
 }
 
 function renderLedger() {
-  if (!result) {
-    ledger.innerHTML = '<p class="ledger-empty">nothing has crossed yet. agents stay quiet until their student speaks up.</p>';
-    return;
-  }
-  // Each run of the agents starts with the "would you like a change?" round.
-  const runs = [];
-  for (const row of result.trace) {
-    if (row.step === 'signal' && (!runs.length || runs.at(-1).some(r => r.step !== 'signal'))) runs.push([]);
-    if (!runs.length) runs.push([]);
-    runs.at(-1).push(row);
-  }
-  const html = runs.map((rows, i) => {
-    const parts = [];
-    const signals = rows.filter(r => r.step === 'signal');
-    if (signals.length) parts.push(`<div class="round"><p class="round-title">${runs.length > 1 ? `round ${i + 1} · ` : ''}would your student like a change?</p><div class="round-row">${signals.map(t => `<span class="v ${t.ok ? 'yes' : ''}">${t.agent} ${t.ok ? 'yes' : 'no'}</span>`).join('')}</div></div>`);
-    const trigger = rows.find(r => r.step === 'trigger');
-    if (trigger && !trigger.ok) parts.push('<div class="round"><p class="kept">not enough of you want a change for everyone’s safety net. nothing happens, nobody is told.</p></div>');
-    const options = [...new Set(rows.filter(r => r.step === 'option').map(r => r.option))];
-    for (const id of options) {
-      const vs = rows.filter(r => r.step === 'option' && r.option === id);
-      parts.push(`<div class="round"><p class="round-title">${esc(titleOf(id))}</p><div class="round-row">${vs.map(t => `<span class="v ${V_CLASS[t.verdict]}">${t.agent} ${VERDICT[t.verdict]}</span>`).join('')}</div></div>`);
-    }
-    const res = rows.filter(r => r.step === 'result').at(-1);
-    if (res && trigger?.ok) parts.push(`<div class="round"><p class="kept">${res.ok ? `<b>${esc(titleOf(res.option))}</b> for ${res.groupSize === 4 ? 'everyone' : `${res.groupSize} of 4`}` : 'no version works. it closes quietly.'}</p></div>`);
-    return parts.join('');
-  }).join('');
-  ledger.innerHTML = html + '<p class="kept">words, budgets, curfews and thresholds never left any agent.</p>';
+  if (!result) { ledger.innerHTML = '<p class="ledger-empty">nothing has crossed yet. agents stay quiet until their student speaks up.</p>'; return; }
+  ledger.innerHTML = result.log.map(row => `<p class="row${row.ok ? '' : ' miss'}"><span class="lvl l${row.level}">L${row.level}</span><span class="who">${esc(row.from)} → ${esc(row.to)}</span>: ${esc(row.text)}</p>`).join('')
+    + '<p class="kept">never sent: anyone’s words, level, or reason for leaving.</p>';
 }
 
 function render() { renderView(); renderLedger(); }
 
 async function act(action) {
   if (busy) return;
-  clearTimeout(pendingTimer);
+  clearTimeout(timer);
   actions.push(action);
-  // A short pause so the moment of waiting on the others is visible.
-  if (action.type === 'consent' && action.yes) {
+  if (action.yes) {
     phase.textContent = PHASES.waiting;
-    view.innerHTML = `<div class="card"><h3>counted.</h3>${versionLine(result.view.option)}${waitingDots('waiting on the others’ private answers')}</div>`;
-    pendingTimer = setTimeout(refresh, reduceMotion ? 0 : 1300);
+    view.innerHTML = `<div class="card"><h3>confirmed.</h3>${versionLine(result.view.version)}${dots('waiting on the others')}</div>`;
+    timer = setTimeout(refresh, reduceMotion ? 0 : 1200);
     return;
   }
   await refresh();
 }
 
 function startOver() {
-  clearTimeout(pendingTimer);
+  clearTimeout(timer);
   terms = null; actions = []; result = null;
-  showTerms(DEFAULT_ALEX);
+  form.reset();
   readNote.textContent = '';
   render();
 }
 
-price.addEventListener('input', () => { priceOut.textContent = `$${price.value}`; });
-change.addEventListener('change', () => { othersSet.disabled = !change.checked; });
 form.addEventListener('change', event => {
   if (event.target === say) return;
-  // New terms mean a new negotiation: old questions and answers are dropped.
-  if (terms) { clearTimeout(pendingTimer); terms = null; actions = []; result = null; render(); }
+  // New terms or a new what-if mean a fresh negotiation.
+  if (terms) { clearTimeout(timer); terms = readTerms(); actions = []; refresh(); }
 });
 form.addEventListener('submit', async event => {
   event.preventDefault();
@@ -290,11 +235,8 @@ document.querySelector('#start-over').addEventListener('click', startOver);
 view.addEventListener('click', event => {
   const control = event.target.closest('[data-action]');
   if (!control) return;
-  const { action, yes } = control.dataset;
-  if (action === 'reset') { startOver(); return; }
-  act(action === 'join' ? { type: 'join' } : { type: action, yes: yes === '1' });
-  view.tabIndex = -1;
-  view.focus({ preventScroll: true });
+  if (control.dataset.action === 'reset') { startOver(); return; }
+  act({ type: 'confirm', yes: control.dataset.yes === '1' });
 });
 
 readBtn.addEventListener('click', async () => {
@@ -303,37 +245,30 @@ readBtn.addEventListener('click', async () => {
   readBtn.disabled = true;
   readNote.textContent = 'your agent is reading it…';
   try {
-    const r = await fetch('/api/try', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text }) });
-    const body = await r.json();
-    if (!r.ok) { readNote.textContent = body.error ?? 'that didn’t work. try the controls below.'; return; }
+    const body = await post({ text, options: readOptions() });
     if (body.clarify) { readNote.textContent = `your agent asks: ${body.clarify}`; return; }
-    clearTimeout(pendingTimer);
     showTerms(body.terms);
     terms = body.terms; actions = []; result = body.result;
-    readNote.textContent = body.source === 'model' ? 'read by the language model. check the controls below: that’s exactly what your agent will use.' : 'read with simple rules (the model was unavailable). check the controls below.';
+    readNote.textContent = body.source === 'model' ? 'read by the language model. the controls below now show exactly what your agent will use.' : 'read with simple rules (the model was unavailable). check the controls below.';
     render();
-  } catch {
-    readNote.textContent = 'couldn’t reach your agent. the controls below still work.';
+  } catch (e) {
+    readNote.textContent = `couldn’t reach your agent: ${e.message}.`;
   } finally {
     readBtn.disabled = false;
   }
 });
 
-// Is the prototype's server here? Then use its engine, and offer free-text reading.
+// Is the prototype's server here? Then offer free-text reading too.
 (async () => {
   try {
-    const r = await fetch('/api/try', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ terms: DEFAULT_ALEX, actions: [] }) });
-    if (r.ok && (await r.json()).result) {
-      server = true;
-      words.hidden = false;
-      engineLabel.textContent = 'running on our server · same engine as the discord bot · fictional friends';
-      return;
-    }
-  } catch { /* static hosting */ }
-  engineLabel.textContent = 'runs in your browser · same rules as our prototype · fictional friends';
+    await post({ terms: DEFAULT, actions: [] });
+    words.hidden = false;
+    engineLabel.textContent = 'running on our server · same engine as the discord bot · fictional students';
+  } catch {
+    engineLabel.textContent = 'the live demo needs our server. open this page from the deployed site.';
+  }
 })();
 
-showTerms(DEFAULT_ALEX);
 render();
 
 /* ---------- discord invite: only clickable once a real link is set ---------- */

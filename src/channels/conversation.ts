@@ -1,170 +1,203 @@
-// What a student's DM means, and what their agent says back. No Discord code here, so it can be
-// tested on its own. Every decision goes through the plan board's rules.
-import type { CampusEvent } from "../domain/types";
-import type { PlanView } from "../quorum/board";
-import { clock, planLabel, type PlanRuntime } from "../server/plan-runtime";
+// What a message means, and what the agent says back. No Discord code here, so it can be tested.
+// DMs are a student's private line to their own agent. Mentions in a server channel post a
+// group's open seats.
+import type { GroupIntake, SeekerIntake } from "../agents/language";
+import type { SeatView } from "../seat/board";
+import type { Version } from "../seat/engine";
+import type { Hub } from "../seat/hub";
+import { demoSetup } from "../seat/demo";
+import { groupFrom } from "../seat/post";
+import { clock } from "../seat/runtime";
 
 export { clock };
 
-const YES = /^(y|yes|yeah|yep|yup|ya|sure|ok|okay|down|i'?m down|approve|go|let'?s go|do it|sounds good|bet|fine)\b/i;
+const YES = /^(y|yes|yeah|yep|yup|ya|sure|ok|okay|down|i'?m down|i'?m in|in|go|let'?s go|do it|sounds good|bet|fine)\b/i;
 const NO = /^(n|no|nah|nope|pass|not now|no thanks|can'?t)\b/i;
 const HELP = /^(help|\?|what can you do|how does this work)\b/i;
-const STATUS = /^(status|where are we|what'?s up|any updates?)\b/i;
-const JOIN = /^(in|i'?m in|join|count me in|yes|y|yeah|yep|down|bet)\b/i;
-const NEVER_MIND = /^(never ?mind|forget it|scratch that|actually i'?m good|cancel)\b/i;
+const STATUS = /^(status|where are we|what'?s up|any updates?|what'?s open)\b/i;
+const NEVER_MIND = /^(never ?mind|forget it|scratch that|cancel|stop looking)\b/i;
+const DEMO = /^demo\b/i;
+const CLOSE = /^(close|done|we'?re (full|done)|cancel)\b/i;
 
-const DAYS: Record<string, string> = { mon: "mon", tue: "tue", wed: "wed", thu: "thu", fri: "fri", sat: "sat", sun: "sun" };
+const LEVEL: Record<string, string> = { new: "beginner", casual: "casual", competitive: "competitive" };
+const versionLine = (v: Version) => `**${v.label}** from ${clock(v.start)} to ${clock(v.end)}`;
 
-export function planLine(v: PlanView): string {
-  return `**${v.plan.title}** (${DAYS[v.plan.day] ?? v.plan.day} ${clock(v.plan.start)}${v.plan.price != null ? ` · $${v.plan.price}` : ""})`;
-}
-
-/** A version of the plan as a quoted card, so it stands out in a Discord DM. */
-export function eventCard(e: CampusEvent): string {
-  const lines = [`> **${e.title}**`, `> ${DAYS[e.day] ?? e.day} · ${clock(e.start)}–${clock(e.end)} · ${e.price ? `$${e.price} each` : "free"}`];
-  if (e.location) lines.push(`> ${e.location.toLowerCase()}`);
-  return lines.join("\n");
-}
-
-/** A student's own terms, read back so they can check them. */
-export function describeTerms(v: PlanView): string {
-  const t = v.terms!;
-  const c = t.conditions;
-  const what = c.activityTags.includes("any") ? "anything" : c.activityTags.join(" or ");
-  const limits = [c.maxPrice != null ? `$${c.maxPrice} max` : null, c.endsBefore ? `home by ${clock(c.endsBefore)}` : null].filter(Boolean);
-  const lines = [
-    `• **the plan:** ${t.wantsChange ? "you'd rather it change" : "you're happy with it"}`,
-    `• **you could do:** ${[what, ...limits].join(" · ")}`,
-  ];
-  if (t.avoidTags.length) lines.push(`• **not:** ${t.avoidTags.join(", ")}`);
-  if (t.wantsChange) {
-    const only = [t.minOthers > 0 ? `at least ${t.minOthers} other${t.minOthers === 1 ? "" : "s"} want a change too` : null, t.majorityOnly ? "most of the group does" : null].filter(Boolean);
-    lines.push(`• **only if:** ${only.length ? only.join(" and ") : "anyone else wants a change too"}`);
-  }
-  return lines.join("\n");
-}
-
-function stretchWords(v: PlanView): string {
-  const s = v.stretch!;
-  return s.field === "maxPrice" ? `**$${s.to} instead of $${s.from}**` : `**staying till ${clock(v.option!.end)}** instead of being home by ${clock(String(s.from))}`;
+export function describeTerms(t: { kinds: string[]; freeFrom: string; freeUntil: string; level: string; notAlone: boolean }): string {
+  return [
+    `• **join:** ${t.kinds.includes("any") ? "anything" : t.kinds.join(" or ")} · ${LEVEL[t.level]}`,
+    `• **free:** ${clock(t.freeFrom)} to ${clock(t.freeUntil)}, hard stop`,
+    `• **only if:** ${t.notAlone ? "you're not the only new one" : "anything that fits"}`,
+  ].join("\n");
 }
 
 export const HELP_TEXT = [
-  "**how this works**",
-  "1. tell me how you really feel about the group's plan, in your own words:",
-  "> honestly $40 is a lot. under $15, home by 11, only if 2 others feel the same",
-  "2. your friends' agents and i try versions of the plan against everyone's terms. only yes / no / could-stretch answers leave me.",
-  "3. if a version works for everyone, each of you says yes privately. nobody learns who wanted a change, or anyone's limits.",
+  "**how open seat works**",
+  "**want in on something?** dm me your terms, privately:",
+  "> basketball, beginner, free till 2:30, not if i'm the only new one",
+  "**got open seats?** mention me in your server:",
+  "> @open seat 6 of us at court 2 playing 3v3 till 2:30, 4v4 if 2 more join. @dave can sub",
+  "agents pair newcomers, reshape the plan and line up subs. you only hear from me when a complete seat is ready. names unlock when everyone confirms.",
   "",
-  "anytime: **status** · **never mind**",
+  "dm anytime: **status** · **never mind**. in a server: **@open seat demo** adds demo players to try it alone.",
 ].join("\n");
 
-/** The part of a view that decides which notification a student should get. */
-export function viewKey(v: PlanView): string {
-  return [v.stage, v.option?.id ?? "-", v.stretch?.field ?? "-", v.ownJoined ? "joined" : "-"].join("|");
+/** One key per person across all their groups, so we know when to message them. */
+export function viewKey(views: { record: { group: { id: string } }; view: SeatView }[]): string {
+  return views.map(({ record, view: v }) => [record.group.id, v.stage, v.version?.id ?? "-", v.newcomers ?? "-", v.rotation?.at ?? "-"].join("|")).sort().join(";");
 }
 
-/** What a student's agent tells them on its own when their part of the plan changes. */
-export function noteFor(v: PlanView): string | null {
-  const most = v.everyone ? "your whole group" : `${v.shareWords} (everyone whose terms fit)`;
+/** What the agent says on its own when this person's part changes. Null means stay quiet. */
+export function noteFor(v: SeatView): string | null {
+  const r = v.rotation;
   switch (v.stage) {
-    case "stretch":
-      return `✳ **one small ask, just for you**\nyour friends' agents found a version of ${planLine(v)} that works for ${most}:\n${eventCard(v.option!)}\nit works if you can do ${stretchWords(v)}. ok?\nnobody will know it was you. reply **yes** or **no**.`;
-    case "consent":
-      return v.everyone
-        ? `✳ **a version all of you can do**\nyour friends' agents compared terms privately and found a version of ${planLine(v)} that fits everyone:\n${eventCard(v.option!)}\nwould you switch to it? nobody learns who wanted a change, or anyone's limits.\nreply **yes** or **pass**.`
-        : `✳ **a version ${v.shareWords} can do**\nno version fits everyone, but this one fits ${v.shareWords}, you included:\n${eventCard(v.option!)}\nthe original plan still stands for anyone who wants it. switch to this?\nreply **yes** or **pass**.`;
-    case "announced":
-      if (v.ownJoined)
-        return `✳ **it's on**\n${eventCard(v.option!)}\nyou're in with: ${v.joined!.join(", ").toLowerCase()}.\nnobody heard who asked for it, or anyone's limits.`;
-      return `✳ **new version in your group**\n${v.shareWords} are doing this instead of ${planLine(v)}:\n${eventCard(v.option!)}\nthe original plan still stands. reply **in** to join.`;
+    case "rotate":
+      return `✳ **can you sub in?**\n${v.group.title} at ${v.group.place} can go ${versionLine(v.version!)} with newcomers. one of them has to leave at ${clock(r!.at)}.\nrotate in then so it stays ${v.version!.label}?\nreply **yes** or **no**. a no just sends the agents to another arrangement.`;
+    case "confirm":
+      if (v.role === "captain")
+        return `✳ **${v.newcomers} newcomer${v.newcomers === 1 ? "" : "s"} can fill your seats**\nswitch from ${v.group.now} to ${versionLine(v.version!)}?${r ? `\none of them leaves at ${clock(r.at)}, and your sub already agreed to rotate in.` : ""}\nyou learn who they are when everyone confirms, never why. reply **yes** or **pass**.`;
+      return `✳ **a seat is open for you**\n${v.group.title} at ${v.group.place}: ${versionLine(v.version!)}.\n${v.newcomers ? `you won't be the only new one: ${v.newcomers} other newcomer${v.newcomers === 1 ? "" : "s"} join${v.newcomers === 1 ? "s" : ""} with you.` : "you're the newcomer they need."}${r ? (r.you ? `\nyou can leave at ${clock(r.at)}: someone rotates in for you.` : `\none newcomer leaves at ${clock(r.at)} and a sub rotates in.`) : ""}\nnames unlock when everyone confirms. reply **yes** to take your seat, or **pass**.`;
+    case "seated":
+      return `✳ **you're in**\n${v.group.place} · ${versionLine(v.version!)}\nwith: ${v.names!.join(", ")}.${r ? `\nrotation at ${clock(r.at)}.` : ""}`;
     case "closed":
-      return "**no version worked this time.**\nthe original plan stands, and nobody learns why. your terms stay private.";
+      return v.role === "captain" ? "**no arrangement for your open seats right now.** i'll keep looking while your post is up." : null;
     default:
       return null;
   }
 }
 
-function statusText(v: PlanView, rt: PlanRuntime, id: string): string {
-  const note = noteFor(v);
-  if (note && v.stage !== "closed") return note;
-  if (v.stage === "waiting") return `**you said yes.** waiting on the others' private answers for:\n${eventCard(v.option!)}`;
-  if (v.terms && rt.board.hasDraft(id)) return `**kept between us (not locked in yet)**\n${describeTerms(v)}\n\nreply **yes** to lock it in.`;
-  if (v.terms) return `**your agent has your terms**\n${describeTerms(v)}\n\nnothing happens unless a version works.`;
-  return `**your group's plan:** ${planLine(v)}\n\nhow do you really feel about it? tell me privately.`;
+export interface DmContext {
+  userId: string;
+  /** Servers this person shares with the bot. */
+  guilds: string[];
+  now: string;
+  parse: (text: string, activity: string, now: string) => Promise<SeekerIntake>;
+}
+
+function statusText(hub: Hub, ctx: DmContext): string {
+  const views = hub.views(ctx.userId);
+  for (const { view } of views) {
+    const note = noteFor(view);
+    if (note && view.stage !== "closed") return note;
+    if (view.stage === "waiting") return "**you said yes.** waiting on the others. names unlock when everyone confirms.";
+  }
+  const own = views.find(({ view }) => view.role === "captain" || view.role === "sub");
+  if (own) return `**your group:** ${own.record.group.title} at ${own.record.group.place}. i'll message you only when there's something to decide.`;
+  const t = hub.terms(ctx.userId);
+  if (t && !t.approved) return `**kept between us (not locked in yet)**\n${describeTerms(t.input)}\n\nreply **yes** to lock it in.`;
+  if (t) return `**quietly looking**\n${describeTerms(t.input)}\n\nyou won't get counteroffers or failed searches. only a complete seat.`;
+  const open = hub.openIn(ctx.guilds);
+  return open.length
+    ? `**open seats in your servers:**\n${open.map((r) => `• ${r.group.title} at ${r.group.place} (${r.group.now} now)`).join("\n")}\nwant in? tell me privately what you'd join and on what terms.`
+    : "no open seats in your servers right now. tell me what you'd join, and i'll quietly look as groups post.";
 }
 
 /** Handle one DM and include any news the sender's own message caused. */
-export async function respond(rt: PlanRuntime, id: string, raw: string): Promise<string[]> {
-  const before = viewKey(rt.view(id));
-  const replies = await handleMessage(rt, id, raw);
-  const after = rt.view(id);
-  if (viewKey(after) !== before) {
-    const note = noteFor(after);
+export async function respondDM(hub: Hub, ctx: DmContext, raw: string): Promise<string[]> {
+  const before = new Map(hub.views(ctx.userId).map(({ record, view }) => [record.group.id, viewKey([{ record, view }])]));
+  const replies = await handleDM(hub, ctx, raw);
+  for (const entry of hub.views(ctx.userId)) {
+    if (before.get(entry.record.group.id) === viewKey([entry])) continue;
+    const note = noteFor(entry.view);
     if (note && !replies.includes(note)) replies.push(note);
   }
   return replies;
 }
 
-/** Handle one DM from a linked student. Returns the agent's replies, in order. */
-export async function handleMessage(rt: PlanRuntime, id: string, raw: string): Promise<string[]> {
+export async function handleDM(hub: Hub, ctx: DmContext, raw: string): Promise<string[]> {
   const text = raw.trim();
   if (!text) return [];
-  const v = rt.view(id);
+  const id = ctx.userId;
   try {
     if (HELP.test(text)) return [HELP_TEXT];
-    if (STATUS.test(text)) return [statusText(v, rt, id)];
+    if (STATUS.test(text)) return [statusText(hub, ctx)];
 
-    // A decision waiting on this student comes first.
-    if (v.stage === "stretch") {
+    const pending = hub.pending(id);
+    if (pending) {
+      const { record, view } = pending;
+      const gid = record.group.id;
+      if (view.stage === "rotate") {
+        if (YES.test(text)) {
+          hub.act(gid, (b) => b.answerRotation(id, true));
+          return [`**got it.** you'll rotate in at ${clock(view.rotation!.at)} if everyone confirms.`];
+        }
+        if (NO.test(text)) {
+          hub.act(gid, (b) => b.answerRotation(id, false));
+          return ["**no problem.** the agents are trying another arrangement. nobody else hears your answer."];
+        }
+        return ["one question is waiting on you: rotate in? reply **yes** or **no**."];
+      }
       if (YES.test(text)) {
-        rt.board.answerStretch(id, true);
-        return ["**got it.** nobody will know it was you."];
+        hub.act(gid, (b) => b.confirm(id, true));
+        // The last yes seats everyone; the "you're in" note says it all.
+        return hub.groups.get(gid)?.board.stage === "seated" ? [] : ["**confirmed.** names unlock when everyone says yes."];
       }
       if (NO.test(text)) {
-        rt.board.answerStretch(id, false);
-        return ["**no problem, that limit stays.** nobody learns you were asked. the agents are trying other versions."];
+        hub.act(gid, (b) => b.confirm(id, false));
+        return ["**passed.** the agents look for another arrangement. nobody learns it was you."];
       }
-      return [`one question is waiting on you: could you do ${stretchWords(v)}? reply **yes** or **no**.`];
+      return ["a complete arrangement is waiting on you. reply **yes** or **pass**."];
     }
-    if (v.stage === "consent") {
+
+    const t = hub.terms(id);
+    if (t && NEVER_MIND.test(text)) {
+      hub.withdrawSeeker(id);
+      return ["**dropped.** your terms are gone, and nobody ever saw them."];
+    }
+    if (t && !t.approved) {
       if (YES.test(text)) {
-        rt.board.consent(id, true);
-        return ["**counted.** when everyone in it says yes, i'll tell you."];
-      }
-      if (NO.test(text)) {
-        rt.board.consent(id, false);
-        return ["**passed.** the agents try the next version. nobody learns it was you."];
-      }
-      return ["a version is waiting on you. reply **yes** to switch to it, or **pass**."];
-    }
-    if (v.stage === "announced") {
-      if (!v.ownJoined && JOIN.test(text)) {
-        rt.board.join(id);
-        return [];
-      }
-      return [statusText(v, rt, id)];
-    }
-    if (v.terms && NEVER_MIND.test(text)) {
-      rt.board.withdraw(id);
-      return ["**dropped.** your terms are gone, and nobody ever heard them."];
-    }
-    if (v.terms && rt.board.hasDraft(id)) {
-      if (YES.test(text)) {
-        rt.approve(id);
-        return rt.view(id).stage === "none" ? ["**locked in.** i'll stay quiet unless a version works for everyone. say **never mind** anytime."] : [];
+        hub.approveSeeker(id);
+        return hub.pending(id) || hub.views(id).some(({ view }) => view.stage === "waiting")
+          ? []
+          : ["**locked in.** i'll stay quiet until a complete seat is ready. no counteroffers, no failed searches. say **never mind** anytime."];
       }
       if (NO.test(text)) return ["ok. tell me what to change, in your own words."];
     }
+    if (hub.views(id).some(({ view }) => view.role === "captain" || view.role === "sub" || view.stage === "seated")) return [statusText(hub, ctx)];
 
-    // Anything else is how they feel about the plan, read by the language model.
-    const read = await rt.parser(text, planLabel(v.plan));
+    const open = hub.openIn(ctx.guilds).map((r) => `${r.group.title} at ${r.group.place}`).join("; ") || "none yet";
+    const read = await ctx.parse(text, open, ctx.now);
     if (read.kind === "clarify") return [read.question];
-    rt.board.draft(id, read.terms);
-    return [`**kept between us.**\n${describeTerms(rt.view(id))}\n\nonly yes/no answers ever leave me. reply **yes** to lock it in, or tell me what to change.`];
+    hub.draftSeeker(id, read.terms, ctx.guilds);
+    return [`**kept between us.**\n${describeTerms(read.terms)}\n\nnone of this leaves me. reply **yes** to lock it in, or tell me what to change.`];
   } catch (error) {
-    // Board rule messages are written for students; pass them on.
-    if (error instanceof Error && /^(nothing to|not in this group)/.test(error.message)) return [error.message + "."];
+    if (error instanceof Error && /^(nothing to|you're already)/.test(error.message)) return [error.message + "."];
     throw error;
   }
+}
+
+export interface PostContext {
+  authorId: string;
+  authorName: string;
+  guildId: string;
+  channelId: string;
+  /** Other people mentioned in the post (the first one is the sub). */
+  mentions: { id: string; name: string }[];
+  now: string;
+  parse: (text: string, now: string) => Promise<GroupIntake>;
+}
+
+/** A mention of the bot in a server channel. Returns the bot's reply in that channel. */
+export async function handlePost(hub: Hub, ctx: PostContext, raw: string): Promise<string> {
+  const text = raw.trim();
+  hub.setName(ctx.authorId, ctx.authorName);
+  if (!text || HELP.test(text)) return HELP_TEXT;
+  if (DEMO.test(text)) {
+    const record = demoSetup(hub, ctx.guildId, ctx.channelId, ctx.now);
+    return `✳ **demo players added.** ${record.group.title} at ${record.group.place} is playing ${record.group.now} and needs ${record.group.versions[0].size - record.group.playing} more. two demo students are looking too.\nDM me your terms to try it, for example "basketball, beginner, free for an hour, not if i'm the only new one".`;
+  }
+  const mine = [...hub.groups.values()].find((r) => r.group.captainId === ctx.authorId && r.guildId === ctx.guildId);
+  if (mine && CLOSE.test(text)) {
+    hub.removeGroup(mine.group.id);
+    return `**closed** ${mine.group.title} at ${mine.group.place}. thanks for opening seats.`;
+  }
+  const read = await ctx.parse(text, ctx.now);
+  if (read.kind === "clarify") return read.question;
+  const sub = ctx.mentions[0] ?? null;
+  if (sub) hub.setName(sub.id, sub.name);
+  const group = groupFrom(read.group, ctx.authorId, sub?.id ?? null, ctx.now);
+  if (!group.versions.length) return "that ends too soon for anyone to join. post it again with a later end time.";
+  if (mine) hub.removeGroup(mine.group.id);
+  hub.addGroup(group, ctx.guildId, ctx.channelId);
+  const need = group.versions[0].size - group.playing;
+  return `✳ **open seat:** ${group.title} at ${group.place}\n${group.now} now → ${group.versions[0].label} if exactly ${need} more join · till ${clock(group.versions[0].end)}${sub ? ` · ${sub.name} can sub` : ""}\nwant in? **DM me your terms, privately.** nobody sees who asked until everyone confirms.`;
 }

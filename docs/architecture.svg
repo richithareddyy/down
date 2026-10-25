@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" width="1200" height="660" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
-  <title>How down? works: four students each talk to their own agent, the agents negotiate one round on the plan board, and the group sees only the result</title>
+  <title>How Open Seat works: solo students and a group each tell their own agent their terms; the agents pair newcomers, reshape the game, privately ask the sub, and everyone confirms at once before names unlock</title>
   <defs>
     <marker id="ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9z" fill="#2a1e29"/></marker>
     <marker id="rust" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9z" fill="#a8431f"/></marker>
@@ -16,44 +16,43 @@
 
   <rect width="1200" height="660" fill="#f3eee5"/>
 
-  <text x="60" y="76" class="serif" font-size="36" fill="#2a1e29">down? <tspan font-style="italic" font-size="26" fill="#a8431f">the version of the plan everyone’s actually down for</tspan></text>
-  <text x="60" y="108" font-size="15" fill="#655960">Everyone said yes to the $40 club night. Three of four would change it, and nobody wants to say so first.</text>
+  <text x="60" y="76" class="serif" font-size="36" fill="#2a1e29">open seat. <tspan font-style="italic" font-size="26" fill="#a8431f">four requests, none possible alone</tspan></text>
+  <text x="60" y="108" font-size="15" fill="#655960">Court 2 needs exactly two more. Each person tells only their own agent. The agents find the one arrangement that works.</text>
 
-  <text x="60" y="160" class="zone">STUDENTS AND THEIR AGENTS</text>
-  <text x="560" y="160" class="zone">ONE ROUND</text>
-  <text x="945" y="160" class="zone">THE GROUP SEES</text>
+  <text x="60" y="160" class="zone">EVERYONE AND THEIR OWN AGENT</text>
+  <text x="560" y="160" class="zone">ONE ARRANGEMENT</text>
+  <text x="945" y="160" class="zone">EVERYONE GETS</text>
 
-  <!-- students -->
+  <!-- people -->
   <g>
     <circle cx="82" cy="215" r="20" fill="#f0dfd3"/><text x="82" y="222" class="serif" font-size="20" fill="#a8431f" text-anchor="middle">a</text>
-    <text x="116" y="209" class="name">Alex</text>
-    <text x="116" y="230" class="quote">“under $10, home by 11, if 2 others agree”</text>
+    <text x="116" y="209" class="name">Alex · solo</text>
+    <text x="116" y="230" class="quote">“beginner. not as the only new one”</text>
 
-    <circle cx="82" cy="305" r="20" fill="#f0dfd3"/><text x="82" y="312" class="serif" font-size="20" fill="#a8431f" text-anchor="middle">m</text>
-    <text x="116" y="299" class="name">Maya</text>
-    <text x="116" y="320" class="quote">“can’t do $40 this week”</text>
+    <circle cx="82" cy="305" r="20" fill="#f0dfd3"/><text x="82" y="312" class="serif" font-size="20" fill="#a8431f" text-anchor="middle">j</text>
+    <text x="116" y="299" class="name">Jordan · solo</text>
+    <text x="116" y="320" class="quote">“hard stop at 2:20 for chem lab”</text>
 
-    <circle cx="82" cy="395" r="20" fill="#f0dfd3"/><text x="82" y="402" class="serif" font-size="20" fill="#a8431f" text-anchor="middle">j</text>
-    <text x="116" y="389" class="name">Jay</text>
-    <text x="116" y="410" class="quote">“honestly excited for the club”</text>
+    <circle cx="82" cy="395" r="20" fill="#2a1e29"/><text x="82" y="402" class="serif" font-size="20" fill="#f3eee5" text-anchor="middle">s</text>
+    <text x="116" y="389" class="name">Sam · court 2</text>
+    <text x="116" y="410" class="quote">“3v3 now. 4v4 if exactly 2 join”</text>
 
-    <circle cx="82" cy="485" r="20" fill="#f0dfd3"/><text x="82" y="492" class="serif" font-size="20" fill="#a8431f" text-anchor="middle">d</text>
-    <text x="116" y="479" class="name">Dev</text>
-    <text x="116" y="500" class="quote">“early shift, home by 11”</text>
+    <circle cx="82" cy="485" r="20" fill="#2a1e29"/><text x="82" y="492" class="serif" font-size="20" fill="#f3eee5" text-anchor="middle">d</text>
+    <text x="116" y="479" class="name">Dave · sideline</text>
+    <text x="116" y="500" class="quote">“happy to sub in”</text>
   </g>
 
-  <!-- agents: one dot each, private terms stay here -->
+  <!-- agents -->
   <g>
-    <circle cx="455" cy="215" r="7" fill="#a8431f"/>
+    <circle cx="455" cy="215" r="7" fill="#2a1e29"/>
     <circle cx="455" cy="305" r="7" fill="#2a1e29"/>
     <circle cx="455" cy="395" r="7" fill="#2a1e29"/>
-    <circle cx="455" cy="485" r="7" fill="#2a1e29"/>
+    <circle cx="455" cy="485" r="7" fill="#a8431f"/>
   </g>
   <g stroke="#c4b6ab" stroke-width="1.2" stroke-dasharray="2 4">
-    <path d="M420 215H446"/><path d="M340 305H446"/><path d="M370 395H446"/><path d="M330 485H446"/>
+    <path d="M418 215H446"/><path d="M385 305H446"/><path d="M398 395H446"/><path d="M290 485H446"/>
   </g>
 
-  <!-- one-word answers converge on the board -->
   <g stroke="#2a1e29" stroke-width="1.3" fill="none">
     <path d="M462 215C505 215 505 340 538 345"/>
     <path d="M462 305C500 305 505 343 538 345"/>
@@ -61,55 +60,53 @@
     <path d="M462 485C505 485 505 350 538 345"/>
   </g>
   <path d="M536 345H546" stroke="#2a1e29" stroke-width="1.3" marker-end="url(#ink)"/>
-  <!-- the private ask goes back to Alex only -->
-  <path d="M548 236C520 236 505 223 468 216" stroke="#a8431f" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#rust)"/>
-  <text x="560" y="240" font-size="12.5" fill="#a8431f">private ask, to Alex only</text>
+  <!-- the private sub ask goes to Dave only -->
+  <path d="M548 452C520 452 505 476 468 484" stroke="#a8431f" stroke-width="1.5" fill="none" stroke-dasharray="5 4" marker-end="url(#rust)"/>
 
-  <text x="455" y="540" class="note" text-anchor="middle">each agent answers one word:</text>
-  <text x="455" y="559" class="note" text-anchor="middle">fits · close · no</text>
+  <text x="455" y="540" class="note" text-anchor="middle">only what, when and</text>
+  <text x="455" y="559" class="note" text-anchor="middle">the conditions cross</text>
 
-  <!-- the round -->
-  <line x1="574" y1="282" x2="574" y2="512" stroke="#dbd1c4" stroke-width="1.2"/>
+  <!-- the arrangement -->
+  <line x1="574" y1="200" x2="574" y2="512" stroke="#dbd1c4" stroke-width="1.2"/>
   <g>
-    <circle cx="574" cy="282" r="12" fill="#f3eee5" stroke="#2a1e29" stroke-width="1.3"/><text x="574" y="287" font-size="12" fill="#2a1e29" text-anchor="middle">1</text>
-    <text x="600" y="279" class="step">A round starts</text>
-    <text x="600" y="298" class="desc">2+ want a change, and every threshold holds</text>
+    <circle cx="574" cy="200" r="12" fill="#f3eee5" stroke="#2a1e29" stroke-width="1.3"/><text x="574" y="205" font-size="12" fill="#2a1e29" text-anchor="middle">1</text>
+    <text x="600" y="197" class="step">Alone, nothing works</text>
+    <text x="600" y="216" class="desc">one newcomer breaks 3v3; Alex won’t go solo</text>
 
-    <circle cx="574" cy="340" r="12" fill="#f3eee5" stroke="#2a1e29" stroke-width="1.3"/><text x="574" y="345" font-size="12" fill="#2a1e29" text-anchor="middle">2</text>
-    <text x="600" y="337" class="step">The agents try versions</text>
-    <text x="600" y="356" class="desc">same club, earlier and $12, comes first</text>
+    <circle cx="574" cy="278" r="12" fill="#f3eee5" stroke="#2a1e29" stroke-width="1.3"/><text x="574" y="283" font-size="12" fill="#2a1e29" text-anchor="middle">2</text>
+    <text x="600" y="275" class="step">The agents pair up</text>
+    <text x="600" y="294" class="desc">Alex + Jordan: neither is the only new one</text>
 
-    <circle cx="574" cy="398" r="12" fill="#a8431f"/><text x="574" y="403" font-size="12" fill="#f3eee5" text-anchor="middle">3</text>
-    <text x="600" y="395" class="step" fill="#a8431f">One private ask</text>
-    <text x="600" y="414" class="desc">“$12 instead of $10?” only Alex is asked</text>
+    <circle cx="574" cy="356" r="12" fill="#f3eee5" stroke="#2a1e29" stroke-width="1.3"/><text x="574" y="361" font-size="12" fill="#2a1e29" text-anchor="middle">3</text>
+    <text x="600" y="353" class="step">The game reshapes</text>
+    <text x="600" y="372" class="desc">3v3 half court → 4v4 full court at 1:35</text>
 
-    <circle cx="574" cy="456" r="12" fill="#f3eee5" stroke="#2a1e29" stroke-width="1.3"/><text x="574" y="461" font-size="12" fill="#2a1e29" text-anchor="middle">4</text>
-    <text x="600" y="453" class="step">Everyone says yes, privately</text>
-    <text x="600" y="472" class="desc">same question for all, so no one can tell</text>
+    <circle cx="574" cy="434" r="12" fill="#a8431f"/><text x="574" y="439" font-size="12" fill="#f3eee5" text-anchor="middle">4</text>
+    <text x="600" y="431" class="step" fill="#a8431f">One private ask</text>
+    <text x="600" y="450" class="desc">only Dave: “sub in at 2:20?”</text>
 
-    <circle cx="574" cy="514" r="12" fill="#f3eee5" stroke="#2a1e29" stroke-width="1.3"/><text x="574" y="519" font-size="12" fill="#2a1e29" text-anchor="middle">5</text>
-    <text x="600" y="511" class="step">The group hears it</text>
-    <text x="600" y="530" class="desc">a no or a pass tries the next version</text>
+    <circle cx="574" cy="512" r="12" fill="#f3eee5" stroke="#2a1e29" stroke-width="1.3"/><text x="574" y="517" font-size="12" fill="#2a1e29" text-anchor="middle">5</text>
+    <text x="600" y="509" class="step">Everyone confirms at once</text>
+    <text x="600" y="528" class="desc">then names and the court unlock</text>
   </g>
 
-  <!-- the group channel -->
-  <path d="M745 506C905 506 905 290 937 290" stroke="#2a1e29" stroke-width="1.3" fill="none" marker-end="url(#ink)"/>
+  <!-- what everyone gets -->
+  <path d="M800 509H900C922 509 922 290 937 290" stroke="#2a1e29" stroke-width="1.3" fill="none" marker-end="url(#ink)"/>
   <rect x="945" y="196" width="215" height="176" rx="16" fill="#2a1e29"/>
-  <text x="967" y="226" font-size="12" fill="#b3a3ad">#plans</text>
-  <text x="967" y="260" class="serif" font-size="19" fill="#f3eee5">✳ New version of</text>
-  <text x="967" y="286" class="serif" font-size="19" fill="#f3eee5">the plan: all of</text>
-  <text x="967" y="312" class="serif" font-size="19" fill="#f3eee5">you are down.</text>
-  <text x="967" y="350" font-size="12.5" fill="#b3a3ad">same club · fri 8:30 pm · $12</text>
+  <text x="967" y="226" font-size="12" fill="#b3a3ad">a DM to Alex</text>
+  <text x="967" y="260" class="serif" font-size="19" fill="#f3eee5">✳ A seat is open</text>
+  <text x="967" y="286" class="serif" font-size="19" fill="#f3eee5">for you. 4v4 at 1:35,</text>
+  <text x="967" y="312" class="serif" font-size="19" fill="#f3eee5">one other newcomer.</text>
+  <text x="967" y="350" font-size="12.5" fill="#b3a3ad">names unlock when all confirm</text>
 
   <text x="945" y="418" class="zone" style="fill:#a8431f">NEVER LEAVES AN AGENT</text>
   <g class="desc">
     <text x="945" y="446">your words</text>
-    <text x="945" y="470">your budget, curfew or threshold</text>
-    <text x="945" y="494">who asked, stretched or passed</text>
-    <text x="945" y="518">names, counts, reasons</text>
+    <text x="945" y="470">your level, or that you’re nervous</text>
+    <text x="945" y="494">why you have to leave early</text>
+    <text x="945" y="518">who passed</text>
   </g>
 
-  <!-- inputs -->
   <line x1="60" y1="596" x2="1140" y2="596" stroke="#dbd1c4" stroke-width="1"/>
-  <text x="60" y="626" class="note">Claude reads each DM into terms (strict JSON, with a rule-based fallback). The plan and its versions come from the server’s Discord events. The website runs the same engine.</text>
+  <text x="60" y="626" class="note">Any Discord server: groups mention the bot to post open seats, anyone DMs it their terms. Claude reads both into structured terms; plain code decides every arrangement.</text>
 </svg>
