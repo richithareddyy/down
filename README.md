@@ -8,11 +8,45 @@ DevHacks S3 · Cubbie Hackathon · Track 02 (agent-to-agent coordination) · Tea
 
 ## How it works
 
+![down? architecture: each student DMs their own agent; the agents answer one word per version to the plan board; the group channel hears the new version with no names](docs/architecture.svg)
+
 1. **Say it privately.** In a Discord DM, a student tells their agent things like "$40 + an uber is a lot. under $10, home by 11, only if 2 others feel the same." The agent reads it into terms: whether they'd like a change, a budget, a curfew, things they rule out, and a threshold. The terms are read back, and nothing counts until the student says yes.
 2. **The agents try versions.** A round starts only when at least two people want a change and every one of their thresholds holds, so a change can never point to one person. For each version of the plan, each agent answers one word: fits, close (a small stretch would work) or no.
 3. **Private asks.** If a version is close for someone, only that person is asked: "works for your whole group if you can do $12 instead of $10. ok? nobody will know it was you." A no keeps the limit firm, and the agents try the next version.
 4. **Everyone says yes, privately.** Everyone in the version gets the same question, so the person who's happy with the plan hears exactly what the person who can't afford it hears. A pass sends the agents to the next version.
 5. **The group hears it.** The group channel gets the new version with no names, counts or reasons. If no version fits everyone, the agents offer the one that fits the most people who wanted a change, and the original plan still stands for everyone else.
+
+### One round, step by step
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Alex
+    participant A as Alex's agent
+    participant B as Plan board
+    participant F as Maya's, Jay's and Dev's agents
+    participant G as Group channel
+    Alex->>A: "under $10, home by 11, only if 2 others feel the same"
+    A-->>Alex: reads it back as terms. ok?
+    Alex->>A: yes
+    A->>B: would like a change
+    F->>B: maya: yes · jay: no · dev: yes
+    Note over B: 3 want a change, so Alex's "2 others" holds. A round starts.
+    B->>A: same club, early entry, $12?
+    B->>F: same club, early entry, $12?
+    A-->>B: close ($2 over)
+    F-->>B: fits · fits · fits
+    B->>A: private ask, for Alex only
+    A->>Alex: "works for your whole group if you can do $12 instead of $10. nobody will know it was you."
+    Alex->>A: yes
+    B->>A: would you switch? (same words for everyone)
+    B->>F: would you switch?
+    A-->>B: yes
+    F-->>B: yes · yes · yes
+    B->>G: "new version of the plan: all of you are down" (no names, no reasons)
+```
+
+If Alex says no to the ask, the limit stays firm and the agents try the next version. Most of the group gets open mic, and the club night still stands for Jay.
 
 | Track 2 ask | In down? |
 |---|---|
@@ -37,7 +71,7 @@ npm run dev
 ```
 
 - **Website:** http://localhost:3000. You play Alex in "okay, are you not down?", typing how you feel or using the controls. Maya, Jay and Dev are demo friends. On the server, the site uses the same engine and language model as the bot. Hosted as static files (`public/site`), the same rules run in the browser (`public/site/prototype.js`), and a test checks that both give the same result.
-- **Discord:** invite the bot to a server, DM it, and pick a seat (alex, maya, jay or dev). Seats nobody picks are played by demo friends, so it works with one person or four. The bot uses the Direct Messages, Guilds and Guild Scheduled Events intents (no privileged ones). It posts to `DISCORD_GROUP_CHANNEL_ID`, else `#plans`, else `#general`.
+- **Discord:** invite the bot to a server, DM it, and pick a seat (alex, maya, jay or dev). Seats nobody picks are played by demo friends, so it works with one person or four. DM `reset demo` for a fresh round (seats stay claimed). The bot uses the Direct Messages, Guilds and Guild Scheduled Events intents (no privileged ones). It posts to `DISCORD_GROUP_CHANNEL_ID`, else `#plans`, else `#general`.
 - Without `ANTHROPIC_API_KEY`, a rule-based reader handles budgets, curfews and thresholds.
 
 ```sh

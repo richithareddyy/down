@@ -19,6 +19,8 @@ const store = globalThis as unknown as { downDiscord?: Bridge };
 const NAMES = new Map(students.map((s) => [s.name.toLowerCase(), s.id]));
 const CLAIM = /^(?:i'?m |im |i am |join |as )?(alex|maya|jay|dev)\b/i;
 const LEAVE = /^(leave|switch|unlink|reset me)\b/i;
+// Demo retakes: a fresh round for everyone, seats stay claimed.
+const RESET = /^reset demo$/i;
 
 function owner(bridge: Bridge, seat: string) {
   for (const [user, id] of bridge.links) if (id === seat) return user;
@@ -73,6 +75,15 @@ async function onMessage(bridge: Bridge, msg: Message) {
         HELP_TEXT,
         `**your group's plan:** ${planLine(rt.view(id))}\neveryone said yes. how do you really feel about it?`,
       ]);
+      return;
+    }
+    if (RESET.test(text)) {
+      rt.reset();
+      bridge.announced = null;
+      for (const id of bridge.links.values()) bridge.lastKey.set(id, viewKey(rt.view(id)));
+      await send(bridge, userId, [`**fresh start.** everyone's terms are cleared; seats stay as they are.
+**your group's plan:** ${planLine(rt.view(seat))}
+how do you really feel about it?`]);
       return;
     }
     if (LEAVE.test(text)) {

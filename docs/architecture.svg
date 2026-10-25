@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>down? architecture: students, their own agents, the plan board, and what the group sees</title>
+  <defs>
+    <marker id="ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2a1e29"/></marker>
+    <marker id="rust" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#a8431f"/></marker>
+    <marker id="soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8a7d84"/></marker>
+    <style>
+      .t { font-family: Georgia, 'Times New Roman', serif; fill: #2a1e29; }
+      .m { font-family: ui-monospace, Menlo, Consolas, monospace; }
+      .lab { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; letter-spacing: .08em; fill: #655960; }
+      .name { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 600; fill: #2a1e29; }
+      .body { font-size: 13px; fill: #4b3e49; }
+      .small { font-size: 12px; fill: #655960; }
+      .card { fill: #faf7f1; stroke: #c4b6ab; stroke-width: 1.2; }
+      .lock { fill: #f0dfd3; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="800" fill="#f3eee5"/>
+
+  <!-- title -->
+  <text x="40" y="58" class="t" font-size="32">down? <tspan font-style="italic" fill="#a8431f">how it works</tspan></text>
+  <text x="40" y="84" class="small">Each student’s words stay with their own agent. Between agents, only one word per version crosses.</text>
+
+  <!-- column labels -->
+  <text x="40" y="128" class="lab">STUDENTS · DISCORD DMS</text>
+  <text x="290" y="128" class="lab">THEIR OWN AGENTS</text>
+  <text x="610" y="128" class="lab">THE PLAN BOARD · ONE ROUND</text>
+  <text x="960" y="128" class="lab">WHAT THE GROUP SEES</text>
+
+  <!-- students -->
+  <g>
+    <rect x="40" y="145" width="190" height="96" rx="14" class="card"/>
+    <text x="58" y="172" class="name">alex</text>
+    <text x="58" y="194" class="body">“under $10, home by 11,</text>
+    <text x="58" y="212" class="body">only if 2 others feel</text>
+    <text x="58" y="230" class="body">the same”</text>
+
+    <rect x="40" y="267" width="190" height="96" rx="14" class="card"/>
+    <text x="58" y="294" class="name">maya</text>
+    <text x="58" y="316" class="body">“can’t do $40 this week.</text>
+    <text x="58" y="334" class="body">anything under $15”</text>
+
+    <rect x="40" y="389" width="190" height="96" rx="14" class="card"/>
+    <text x="58" y="416" class="name">jay</text>
+    <text x="58" y="438" class="body">“excited for the club.</text>
+    <text x="58" y="456" class="body">keep it a club thing”</text>
+
+    <rect x="40" y="511" width="190" height="96" rx="14" class="card"/>
+    <text x="58" y="538" class="name">dev</text>
+    <text x="58" y="560" class="body">“home by 11, if anyone</text>
+    <text x="58" y="578" class="body">else wants a change”</text>
+  </g>
+
+  <!-- DM arrows -->
+  <g stroke="#2a1e29" stroke-width="1.3" fill="none" marker-end="url(#ink)">
+    <path d="M232 193H286"/><path d="M232 315H286"/><path d="M232 437H286"/><path d="M232 559H286"/>
+  </g>
+  <text x="259" y="185" class="lab" text-anchor="middle">DM</text>
+
+  <!-- agents -->
+  <g>
+    <rect x="290" y="145" width="240" height="96" rx="14" class="card"/>
+    <rect x="290" y="145" width="240" height="96" rx="14" fill="none" stroke="#a8431f" stroke-width="1.6"/>
+    <text x="308" y="172" class="name">alex’s agent</text>
+    <text x="308" y="194" class="body">wants a change · $10 max</text>
+    <text x="308" y="212" class="body">home by 11 pm · ≥ 2 others</text>
+    <rect x="308" y="221" width="78" height="14" rx="7" class="lock"/><text x="347" y="232" class="m" font-size="9.5" fill="#a8431f" text-anchor="middle">PRIVATE</text>
+
+    <rect x="290" y="267" width="240" height="96" rx="14" class="card"/>
+    <text x="308" y="294" class="name">maya’s agent</text>
+    <text x="308" y="316" class="body">wants a change · $15 max</text>
+    <text x="308" y="334" class="body">≥ 1 other</text>
+    <rect x="308" y="343" width="78" height="14" rx="7" class="lock"/><text x="347" y="354" class="m" font-size="9.5" fill="#a8431f" text-anchor="middle">PRIVATE</text>
+
+    <rect x="290" y="389" width="240" height="96" rx="14" class="card"/>
+    <text x="308" y="416" class="name">jay’s agent</text>
+    <text x="308" y="438" class="body">happy with the plan</text>
+    <text x="308" y="456" class="body">any version: club or dance</text>
+    <rect x="308" y="465" width="78" height="14" rx="7" class="lock"/><text x="347" y="476" class="m" font-size="9.5" fill="#a8431f" text-anchor="middle">PRIVATE</text>
+
+    <rect x="290" y="511" width="240" height="96" rx="14" class="card"/>
+    <text x="308" y="538" class="name">dev’s agent</text>
+    <text x="308" y="560" class="body">wants a change · home by 11</text>
+    <text x="308" y="578" class="body">≥ 1 other</text>
+    <rect x="308" y="587" width="78" height="14" rx="7" class="lock"/><text x="347" y="598" class="m" font-size="9.5" fill="#a8431f" text-anchor="middle">PRIVATE</text>
+  </g>
+
+  <!-- agents <-> board -->
+  <g stroke="#2a1e29" stroke-width="1.3" fill="none">
+    <path d="M532 200H606" marker-end="url(#ink)"/>
+    <path d="M532 315H606" marker-end="url(#ink)"/>
+    <path d="M532 437H606" marker-end="url(#ink)"/>
+    <path d="M532 559H606" marker-end="url(#ink)"/>
+  </g>
+  <path d="M606 180H536" stroke="#a8431f" stroke-width="1.6" fill="none" stroke-dasharray="5 4" marker-end="url(#rust)"/>
+  <text x="570" y="173" class="m" font-size="10" fill="#a8431f" text-anchor="middle">private ask</text>
+  <g class="m" font-size="10.5" text-anchor="middle">
+    <text x="570" y="368" fill="#655960">one word</text>
+    <text x="570" y="382" fill="#655960">per version</text>
+    <text x="570" y="402" fill="#2a1e29">fits</text>
+    <text x="570" y="416" fill="#2a1e29">close</text>
+    <text x="570" y="430" fill="#2a1e29">no</text>
+  </g>
+
+  <!-- board -->
+  <rect x="610" y="145" width="300" height="462" rx="18" fill="#faf7f1" stroke="#2a1e29" stroke-width="1.6"/>
+  <g>
+    <circle cx="640" cy="180" r="13" fill="#2a1e29"/><text x="640" y="185" class="m" font-size="12" fill="#f3eee5" text-anchor="middle">1</text>
+    <text x="664" y="176" class="name">does a round start?</text>
+    <text x="664" y="196" class="body">only if ≥ 2 want a change and</text>
+    <text x="664" y="213" class="body">every one of their thresholds holds</text>
+
+    <circle cx="640" cy="262" r="13" fill="#2a1e29"/><text x="640" y="267" class="m" font-size="12" fill="#f3eee5" text-anchor="middle">2</text>
+    <text x="664" y="258" class="name">try versions, best first</text>
+    <text x="664" y="278" class="body">each agent judges its own student:</text>
+    <text x="664" y="295" class="body">fits · close (small stretch) · no</text>
+
+    <circle cx="640" cy="344" r="13" fill="#a8431f"/><text x="640" y="349" class="m" font-size="12" fill="#f3eee5" text-anchor="middle">3</text>
+    <text x="664" y="340" class="name" fill="#a8431f">private ask</text>
+    <text x="664" y="360" class="body">only the person who’d stretch:</text>
+    <text x="664" y="377" class="body">“$12 instead of $10?”</text>
+
+    <circle cx="640" cy="426" r="13" fill="#2a1e29"/><text x="640" y="431" class="m" font-size="12" fill="#f3eee5" text-anchor="middle">4</text>
+    <text x="664" y="422" class="name">same question for everyone</text>
+    <text x="664" y="442" class="body">“would you switch?” so nobody</text>
+    <text x="664" y="459" class="body">can tell who asked for a change</text>
+
+    <circle cx="640" cy="508" r="13" fill="#2a1e29"/><text x="640" y="513" class="m" font-size="12" fill="#f3eee5" text-anchor="middle">5</text>
+    <text x="664" y="504" class="name">announce, or try the next one</text>
+    <text x="664" y="524" class="body">a no or a pass sends the agents</text>
+    <text x="664" y="541" class="body">to the next version, silently</text>
+
+    <path d="M640 194V248M640 276V330M640 358V412M640 440V494" stroke="#c4b6ab" stroke-width="1.2"/>
+    <text x="760" y="588" class="small" text-anchor="middle">src/quorum · engine + board</text>
+  </g>
+
+  <!-- board -> outputs -->
+  <path d="M912 215C935 215 935 215 956 215" stroke="#2a1e29" stroke-width="1.3" fill="none" marker-end="url(#ink)"/>
+
+  <!-- outputs -->
+  <rect x="960" y="145" width="200" height="150" rx="14" fill="#2a1e29"/>
+  <text x="978" y="172" class="lab" fill="#c9b8c2">#PLANS CHANNEL</text>
+  <text x="978" y="200" font-family="Georgia, serif" font-size="17" fill="#f3eee5">✳ new version of the</text>
+  <text x="978" y="221" font-family="Georgia, serif" font-size="17" fill="#f3eee5">plan: all of you</text>
+  <text x="978" y="242" font-family="Georgia, serif" font-size="17" fill="#f3eee5">are down</text>
+  <text x="978" y="276" class="m" font-size="10.5" fill="#c9b8c2">no names · counts · reasons</text>
+
+  <rect x="960" y="325" width="200" height="128" rx="14" class="card"/>
+  <text x="978" y="352" class="name">website · /api/try</text>
+  <text x="978" y="374" class="body">you play alex; a fresh</text>
+  <text x="978" y="392" class="body">board per visitor, same</text>
+  <text x="978" y="410" class="body">engine as the bot</text>
+  <text x="978" y="436" class="small">app/api/try</text>
+
+  <rect x="960" y="479" width="200" height="128" rx="14" class="card"/>
+  <text x="978" y="506" class="name">static website</text>
+  <text x="978" y="528" class="body">same rules in the</text>
+  <text x="978" y="546" class="body">browser, tested to give</text>
+  <text x="978" y="564" class="body">the same answers</text>
+  <text x="978" y="590" class="small">public/site/prototype.js</text>
+  <path d="M912 389H956" stroke="#8a7d84" stroke-width="1.2" fill="none" stroke-dasharray="4 4" marker-end="url(#soft)"/>
+  <path d="M912 543H956" stroke="#8a7d84" stroke-width="1.2" fill="none" stroke-dasharray="4 4" marker-end="url(#soft)"/>
+
+  <!-- inputs along the bottom -->
+  <rect x="40" y="650" width="490" height="70" rx="14" fill="#ebe4d8" stroke="#c4b6ab" stroke-width="1.2"/>
+  <text x="58" y="677" class="name">Claude reads each DM into terms</text>
+  <text x="58" y="699" class="body">strict JSON schema · rule-based reader if the model is down</text>
+  <path d="M410 648V611" stroke="#8a7d84" stroke-width="1.2" fill="none" stroke-dasharray="4 4" marker-end="url(#soft)"/>
+
+  <rect x="610" y="650" width="300" height="70" rx="14" fill="#ebe4d8" stroke="#c4b6ab" stroke-width="1.2"/>
+  <text x="628" y="677" class="name">Discord server events</text>
+  <text x="628" y="699" class="body">#plan event = the plan · priced = versions</text>
+  <path d="M760 648V611" stroke="#8a7d84" stroke-width="1.2" fill="none" stroke-dasharray="4 4" marker-end="url(#soft)"/>
+
+  <rect x="960" y="650" width="200" height="70" rx="14" fill="none" stroke="#a8431f" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="978" y="677" class="m" font-size="11" fill="#a8431f">NEVER LEAVES AN AGENT</text>
+  <text x="978" y="699" class="small">words · limits · thresholds</text>
+  <text x="978" y="714" class="small">who asked · who passed</text>
+
+  <text x="40" y="768" class="small">All people, events and prices in the demo are fictional. Nothing is booked or paid.</text>
+</svg>
