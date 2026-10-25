@@ -64,7 +64,7 @@ sequenceDiagram
 
 If Alex declines the ask, the limit stays firm and the agents try the next version: most of the group moves to the open mic, and the club night still stands for Jay.
 
-## Track 02 fit
+## Track 02: Agent-to-Agent Coordination - fit
 
 | Requirement | How down? meets it |
 |---|---|
