@@ -8,7 +8,7 @@ DevHacks S3 · Cubbie Hackathon · Track 02 (agent-to-agent coordination) · Tea
 
 ## How it works
 
-![down? architecture: each student DMs their own agent; the agents answer one word per version to the plan board; the group channel hears the new version with no names](docs/architecture.svg)
+![How down? works: four students each tell their own agent how they feel, the agents answer one word per version, one private ask goes to the person who would stretch, and the group channel hears the new version with no names](docs/architecture.svg)
 
 1. **Say it privately.** In a Discord DM, a student tells their agent things like "$40 + an uber is a lot. under $10, home by 11, only if 2 others feel the same." The agent reads it into terms: whether they'd like a change, a budget, a curfew, things they rule out, and a threshold. The terms are read back, and nothing counts until the student says yes.
 2. **The agents try versions.** A round starts only when at least two people want a change and every one of their thresholds holds, so a change can never point to one person. For each version of the plan, each agent answers one word: fits, close (a small stretch would work) or no.
